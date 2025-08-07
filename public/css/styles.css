@@ -1,0 +1,1531 @@
+/* 
+Botanika Mono Regular
+font-family: "botanika-mono-web", monospace;
+font-weight: 400;
+font-style: normal;
+Botanika Mono Italic
+font-family: "botanika-mono-web", monospace;
+font-weight: 400;
+font-style: italic;
+Botanika Mono SemiBold
+font-family: "botanika-mono-web", monospace;
+font-weight: 600;
+font-style: normal;
+Botanika Mono SemiBold Italic
+font-family: "botanika-mono-web", monospace;
+font-weight: 600;
+font-style: italic; */
+h1, h2, h3, h4, h5{
+  font-family: "coolvetica", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+p, a{
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+}
+body{
+  margin:0;
+  background-color:#343F3E;
+  position:relative;
+
+  padding:0;
+}
+#titleCard{
+  position:absolute;
+  z-index:16;
+  left:50%;
+  top:-50px;
+  transform: translateX(-50%);
+  width:30%;
+  object-fit:cover;
+}
+#titleSub{
+  font-size:40px;
+  line-height:0.5;
+}
+#navLogo{
+  position:relative;
+  z-index:15;
+  object-fit:cover;
+  margin-top:10px;
+  height:80px;
+  width:80px;
+}
+nav{
+  z-index:10;
+  margin:0px 5% 25px 0;
+  display: flex;
+  flex-flow:row;
+  justify-content: right;
+  a{
+    margin-left:20px;
+    margin-top:25px;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    text-align: center;
+    padding:12px;
+    width:fit-content;
+    text-wrap:nowrap;
+    flex-shrink:0;
+    z-index:5;
+    color:white;
+    
+  }
+  #title{
+    margin-left:3%;
+    margin-right:auto;
+    width:20%;
+    z-index:5;
+    background-color: #419645;
+  }
+  #communityButton{
+    background-color: #e93a28
+  }
+  #blogButton{
+    background-color:#f4485d;
+  }
+    
+}
+#communityCalendar{
+  width:96%;
+  margin-top:0;
+}
+#communityMonthScroller{
+  margin-top:0;
+  padding-top:0;
+  font-size:80px;
+  margin-bottom:0;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  color:white;
+  h2{
+    margin-top:0;
+    
+  }
+  
+}
+#BlueLine{
+  position:absolute;
+  width:100%;
+  max-width:100%;
+  left:0;
+  top:30px;
+  object-fit:cover;
+  display:block;
+}
+#communityCalendarBackground{
+  position:relative;
+  width:80%;
+  margin:0 auto;
+  background-color:#468caf;
+  z-index:5;
+  padding-top:100px;
+  padding-bottom:30%;
+  margin-bottom:200px;
+}
+#ForkNplateLeftAccentImage{
+  position:absolute;
+  width:33%;
+  bottom:-50px;
+  left:-50px;
+  z-index:1;
+}
+#SpotlightLeft{
+  position:absolute;
+  left:0;
+  transform: translateX(-25%);
+  bottom:-100px;
+  width:40%;
+  z-index:0;
+}
+#SpotlightRight{
+  position:absolute;
+  right:0;
+  transform: translateX(25%);
+  bottom:-100px;
+  width:40%;
+  z-index:0;
+}
+#ForkNplateRightAccentImage{
+  position:absolute;
+  width:33%;
+  bottom:-50px;
+  right:-50px;
+  z-index:1;
+}
+#redAccent{
+  position:absolute;
+  z-index:4;
+  width:114%;
+  bottom:-230%;
+  left:-23%;
+  background-color:red;
+  height:200%;
+}
+#BlogHeaderBG{
+  position:relative;
+  width:100%;
+  object-fit:cover;
+  aspect-ratio:2.04;
+  margin-bottom:-10px;
+}
+.blogHeaderContent{
+  position:absolute;
+  top:3px;
+}
+.BlogHeaderBackground{
+  position:relative;
+  background-image:url("../Images/BlogPostHeaderBG.png");
+  width:65%;
+  background-size:contain;
+  aspect-ratio:5.3/1;
+  z-index:2;
+  margin: 0 20px;
+  display:flex;
+  flex-flow:column;
+  justify-content:center;
+  align-items:center;
+  background-repeat:no-repeat;
+  margin-top:30px;
+  h1, h2{
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    color:#2f9938;
+  }
+  h2{
+    margin-top:0;
+    margin-bottom:0;
+    font-size:16px;
+  }
+  h1{
+    margin-bottom:8px;
+  }
+}
+.BlogPostNav{
+  display:flex;
+  flex-flow:row;
+  align-items:center;
+  justify-content:center;
+  
+}
+#BlogPostNextButton, #BlogPostBackButton{
+  position:relative;
+  background-color:#2f9938;
+  padding:10px;
+  z-index:15;
+}
+.BlogPostBackground{
+  
+  width:100%;
+  background-color: #2f9938;
+  padding-bottom:200px;
+}
+
+#BlogTicket{
+  position:relative;
+  z-index:1;
+  width:70%;
+  background-image: url("../Images/BlogTicket.png");
+  background-size:contain;
+  aspect-ratio:2.49/1;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:50px;
+  margin-bottom:50px;
+  background-repeat:no-repeat;
+  p{
+    width:50%;
+    margin-left:15%;
+    font-family: "pennypacker", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    color:white;
+  }
+}
+#blogList{
+  position:absolute;
+  top:-50px;
+  left:50%;
+  padding-left:20px;
+  padding-right:20px;
+  min-height:200px;
+  transform: translateX(-50%);
+  z-index:2;
+  width:80%;
+  margin:0 auto;
+  background-color:#468caf;
+  height:calc(100vh-(0.5vw+150px));
+  
+}
+#blogPostHOne{
+  margin-top:35px;
+  margin-left:40px;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+}
+#BlogPostNextButton{
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  color:#efd641;
+}
+#BlogPostBackButton{
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  color:#efd641;
+}
+#pencil{
+  position:absolute;
+  display:block;
+  width:7%;
+  top:20px;
+  right:20px;
+}
+#blogItems{
+  list-style:none;
+  margin-top:50px;
+  h1, h2, h3{
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+  }
+  a{
+    text-decoration:none;
+    color:black;
+  }
+}
+.blogPreviewHead{
+  display:flex;
+  flex-flow:row;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  gap:5%;
+}
+#blogPreviewText{
+  
+}
+#blogItem{
+  background-color:white;
+  border-radius:25px;
+  padding:30px;
+  padding-top:10px;
+  padding-right:10px;
+  box-shadow:20px 20px black;
+  margin:0 auto;
+  margin-bottom:60px;
+  width:90%;
+  
+  
+  h3{
+    order:1;
+  }
+  h2{
+    order:3
+  }
+  h1{
+    order:2;
+  }
+  
+}
+#greenAccent{
+  width:100vw;
+  position:absolute;
+  z-index:3;
+  height:120vh;
+  background-color:green;
+  top:100%;
+  left:0;
+  transform: translateX(-25%);
+  background-color:#419645;
+}
+#downArrow{
+  position:absolute;
+  bottom: -8%;
+  left:48%;
+  font-size:50px;
+  z-index:3;
+  color:#468caf;
+}
+.sectionBox{
+  position:relative;
+  z-index:3;
+  width:fit-content;
+  margin:0 auto;
+  text-align: center;
+  justify-content:center;
+  margin-bottom:10px;
+  color:white;
+  font-size:22px;
+  h1{
+    margin-top:0;
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    width:fit-content;
+    margin:0 auto;
+  } 
+  
+}
+
+.cal{
+  border-bottom:none;
+  color: #f24646;
+    
+}
+.hemi{
+  position:absolute;
+  bottom:0;
+  z-index:2;
+  width:100%;
+  
+  border-top-left-radius: 50% 100%;
+  border-top-right-radius: 70% 100%;
+  background-color:orangered;
+}
+#communityBox{
+  display:flex;
+  margin-left:10%;
+  width:30%;
+  aspect-ratio:3.484/1;
+  margin-right:auto;
+  text-align:left;
+  margin-top:60px;
+  font-size:20px;
+  background-image:url("../Images/CloudFilled.png");
+  background-position:center;
+  background-size: cover;
+  h1{
+    font-size:30px;
+    width:fit-content;
+    white-space:nowrap;
+    justify-content:center;
+    align-self:center;
+    color:#468caf;
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    margin-left:25px;
+    margin-top:10px;
+    margin-right:0;
+  }
+  
+}
+#BlogPageBG{
+  position:relative;
+  z-index:2;
+  background-image:url("../Images/BlogBodyBG.png");
+  background-position:top center;
+  background-repeat:no-repeat; 
+  background-position:center;
+  background-size:100% 100%;
+}
+#communityBG{
+  position:relative;
+  width:100%;
+  object-fit:cover;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:0;
+}
+#blurbSurrounding {
+  position: relative;
+  background-image: url("../Images/GreenBlob.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 75%;
+  aspect-ratio:2.2/1;
+  margin-left: auto;
+  z-index: 4;
+  margin-bottom:-12%;
+}
+#redIndexImage{
+  position:absolute;
+  top:-30%;
+  right:-8%;
+  width:18%;
+}
+.blurb{
+  position:relative;
+  z-index:4;
+  padding:40px;
+  margin:0 10%;
+  #blurbText{
+    font-size:24px;
+    color:#468caf;
+    margin: 10px 10%;
+    font-family: "pennypacker", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+  }
+}
+#comBlurb{
+  position:absolute;
+  top:20%;
+  right:50px;
+  background-color:#f4485d;
+  width:55%;
+  aspect-ratio:3.86/1;
+  margin:0;
+  padding:0;
+  color:#efd641;
+  padding:20px;
+  font-size:20px;
+  p{
+    font-family: "pennypacker", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+  }
+  
+  
+}
+#ForkNPlateDoor{
+  display:flex;
+  position:absolute;
+  width:33%;
+  left:50%;
+  transform: translateX(-50%);
+  bottom:-4%;
+}
+.navButton{
+  border:3px solid black;
+  background:none;
+  padding:10px;
+  text-decoration:none;
+  font-family: "coolvetica", sans-serif;
+  font-weight: 700;
+  font-size:24px;
+  font-style: normal;
+  color:white;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  
+  
+}
+
+.clickedOn, .navButton:hover{
+  border:2px solid white;
+  padding:12px;
+    
+}
+.calendar-bg-FP{
+  position:relative;
+  width:100%;
+  background-image:url("../Images/CalendarBG.png");
+  background-size:cover;
+  background-position:center center;
+  z-index:10;
+  margin:0;
+  padding:25px 0 25px 0;
+  margin-top:0;
+  
+}
+#indexMonthScroller{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  margin-top:0;
+  padding-top:15px;
+  padding-left:8%;
+  height:18%;
+  background-color:red;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  display:flex;
+  align-items:flex-start;
+  
+}
+.monthBox{
+  position:relative;
+  z-index:16;
+  width:90%;
+  margin:80px auto 20px auto; 
+  
+  
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); 
+  grid-template-rows: repeat(4, 1fr); 
+  width:100%;
+}
+.calendarNav{
+  margin-top:30px;
+  color:white;
+  font-size:60px;
+}
+.calendarNav:hover{
+  cursor:pointer;
+}
+.doubleWrapper{
+  position:relative;
+  z-index:0;
+}
+.doubleBackground{
+  
+  margin:0;
+  background-color:#468caf;
+  margin-top:0;
+  z-index:1;
+  overflow: visible;
+}
+#TLIllustration{
+  position:absolute;
+  top:0;
+  left:15px;
+  z-index:1;
+  width:550px;
+}
+#CloudIllustration{
+  position:absolute;
+  top: 6%;
+  right:80px;
+  width:30%;
+}
+.aboutBackground{
+  padding-top:25px;
+  padding-bottom:25px;
+  position:relative;
+  margin-top:0;
+  background-color:#419645;
+  width:100%;
+}
+
+#about{
+  background-color:#efd641;
+  margin:0 auto;
+  margin-bottom:50px;
+  margin-top:40px;
+  width:70%;
+  padding:20px;
+  z-index:3;
+  
+}
+.date-box {
+  position:relative;
+  border: 2px solid black;
+  min-width:40px;
+  min-height:140px;
+  justify-content:left;
+  z-index:17;
+  p,h4{
+    width:fit-content;
+    padding:0 5px;
+    font-size:18px;
+    font-weight:bold;
+    display:inline-block;
+    white-space:nowrap;
+    margin-top:10%;
+    margin-left:5px;
+  }
+  
+}
+#community.date-box{
+  border: 2px solid #84cddc;
+  margin:4px;
+}
+#evDate{
+  background-color:white;
+  font-size:18px;
+  width:fit-content;
+  padding:0 5px;
+    
+  font-weight:bold;
+}
+.top-bg-images{
+  position:absolute;
+  top:0;
+  display:flex;
+  flex-flow:row nowrap;
+  width:100%;
+  z-index: 0;
+  img{
+    width:33.4%
+  }
+  
+}
+.footer{
+  padding-left:40%;
+  height:200px;
+  h3{
+    color:white;
+    white-space:nowrap;
+    width:fit-content;
+    padding:10px;
+    background-color:#419645;
+  }
+}
+.footerFlex{
+  display:flex;
+  flex-flow:row;
+}
+.footerNav{
+  width:fit-content;
+  padding:10px;
+  background-color:#efd641;
+  height:fit-content;
+  margin-top:30px;
+  margin-right:20px;
+}
+.contacts{
+  display:flex;
+  flex-flow:column;
+  width:fit-content;
+  margin-left:auto;
+  margin-right:20px;
+  h3{
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    color:white;
+  }
+}
+.contactIcons{
+  display:flex;
+  flex-flow:row;
+  width:100%;
+}
+.contactIcon{
+  width:50px;
+  margin-right:20px;
+  height:auto;
+  display:block;
+}
+.credits{
+  display:flex;
+  flex-flow:column;
+  margin-top:20px;
+  width:fit-content;
+  margin-left:10px;
+  margin-right:20px;
+  sub{
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    color:white;
+  }
+  a{
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    color:white;
+  }
+  a:hover{
+    color:#468caf;
+  }
+}
+.date-box:hover{
+  cursor:pointer;
+}
+.eventBox, #event{
+  flex:1;
+  position: relative; /* Position relative to .date-box */
+  width:100%;
+   /* Make it fill the parent .date-box */
+  background-size: cover; /* Ensures the image covers the entire area */
+  background-position: center; /* Centers the image */
+  transition: filter 0.3s ease-in-out; /* Smooth blur transition */
+  z-index: 0;
+  p, h4{
+    width:fit-content;
+    overflow:wrap;
+    white-space:normal;
+    padding:0 5px;
+    background-color:white;
+    display:inline-block;
+    margin-top:10%;
+    
+    
+  }
+}
+.blur{
+  -webkit-filter: blur(5px);
+ -moz-filter: blur(5px);
+ -o-filter: blur(5px);
+ -ms-filter: blur(5px);
+ filter: blur(5px);
+}
+.eventSlideOver {
+  /* Initial styling for the slide-over text */
+  position:absolute; /* Or relative, depending on your layout */
+  color:white;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(128, 128, 128, 0.8); /* Optional background for readability */
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  
+  z-index:18;
+  /* Initially hidden */
+  p{
+    margin-top:1%;
+    margin-bottom:2%;
+  }
+}
+
+.hidden{
+  visibility:hidden;
+}
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.carousel-container {
+  position: relative; /* For positioning buttons */
+  overflow: hidden;   /* Hide images that are out of view */
+  max-width: 100%;    /* Make it responsive within its container */
+  margin-top:190px;
+  margin-right: 2%;
+  margin-left: 2%;
+  z-index:3;
+  
+}
+
+.carousel-track {
+  display: flex; /* Arrange images horizontally */
+  
+  transition: transform 0.3s ease-in-out; /* Smooth scrolling */
+}
+.forkLink{
+  width:98%;
+  height:98%;
+  background-size:cover;
+  text-align:center;
+  text-decoration:none;
+  display:flex;
+  flex-flow:column;
+  align-items:center;
+  gap:5px;
+  h1,h2,p{
+    border-radius:25px;
+    background:white;
+    width:fit-content;
+    padding:5px;
+    color:black;
+    margin:0 auto;
+    
+  }
+}
+.frame{
+  position:relative;
+  z-index:14;
+  background-image:url("../Images/Frame.png");
+  background-size: contain;
+  background-repeat:no-repeat;
+  flex-shrink: 0; /* Prevent images from shrinking */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width:calc(100%/3 - 15px);
+  aspect-ratio:1/1;
+  margin:20px 10px;
+  overflow:hidden;
+}
+.frame img{
+  position:relative;
+  z-index:13;
+  width:98%;
+  height:98%;
+  padding:0;
+  margin:0 auto;
+  object-fit:cover;
+}
+.BPImage{
+  width:80%;
+  margin:0 auto;
+  object-fit:cover;
+}
+
+
+#leaf{
+  position:absolute;
+  bottom:0;
+  left:0;
+  z-index:15;
+  width:15%;
+}
+.footerNav, sub{
+  position:relative;
+  z-index:16;
+}
+.BPB{
+  cursor:pointer;
+}
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10; /* Ensure buttons are on top */
+}
+#blogPostDate{
+  width:fit-content;
+  margin: 0 auto;
+  margin-top:15px;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 200;
+  font-style: normal;
+  color:#efd641;
+  position:relative;
+  z-index:5;
+  
+}
+.blogMeat{
+  position:relative;
+  margin:0 auto;
+  margin-top:20px;
+  padding-left:20px;
+  padding-right:40px;
+  width:70%;
+  background-color:#f4f1ed;
+  padding-top:50px;
+  min-height:600px;
+  z-index:2;
+  text-align:center;
+}
+#blogPostBody{
+  p{
+    text-align:left;
+  }
+}
+.blogLink{
+  background-color:white;
+  height:calc(97% - 45px);
+  width:calc(97% - 45px);
+  color:black;
+  text-decoration:none;
+  padding:20px;
+  font-family: "botanika-mono-web", monospace;
+  font-weight: 500;
+  font-style: normal;
+  box-shadow: 5px 5px black;
+  border-radius:25px;
+}
+#left.clovers{
+  position:absolute;
+  left:5%;
+  top:10%;
+  width:33%
+}
+#right.clovers{
+  position:absolute;
+  right:5%;
+  top:33%;
+  width:33%;
+}
+#redBug{
+  position: absolute;
+  bottom:calc(5% + 200px);
+  left:2%;
+  width:15%;
+}
+#yellowBug{
+  position:absolute;
+  right:5%;
+  top:8%;
+  width:15%;
+}
+.carousel-button.prev {
+  left: 10px;
+}
+
+.carousel-button.next {
+  right: 0px;
+}
+
+.eventModal{
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4);
+
+}
+.modalContent{
+  display:flex;
+  flex-flow: column nowrap;
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  h3{
+    border-bottom:2px solid #468caf;
+    width:14%;
+  }
+}
+#modalImage{
+  max-width:20%;
+  min-width:10%;
+  flex-shrink:1;
+  right:0;
+  bottom:0;
+  align-self:flex-end;
+}
+/* Media query for wider screens */
+
+@media (min-width: 600px) and (max-width: 1200px) {
+  /* Layout the header and blurb side-by-side */
+  #blurbSurrounding {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start;
+    width: 80%;
+    margin: 0;
+    margin-left:auto;
+    position: relative;
+  }
+
+  #communityBox {
+    width: 35%;
+    margin-left: 5%;
+    margin-top: 60px;
+    background-size: cover;
+    h1{
+      font-size:20px;
+    }
+  }
+  .blurb {
+    width: 60%;
+    padding: 0;
+    margin: 0;
+    position: relative;
+  }
+
+  #comBlurb {
+    position: absolute;
+    top: 20%;
+    right: 5%;
+    left:30%;
+    width:auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: #f4485d;
+    color: #efd641;
+    z-index: 5;
+  }
+
+  #blurbSurrounding {
+    background-image: url("../Images/GreenBlob.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: right center;
+    aspect-ratio: 2.2 / 1;
+  }
+
+  #redAccent{
+    z-index:5;
+    
+    right:5%;
+    left:-15%;
+    width:auto;
+  }
+  #greenAccent {
+    display: block;
+    position: absolute;
+    
+    
+    height: 240%;
+    right:-33.33%;
+    left:0;
+    width:auto;
+    top:78%;
+    z-index: 4;
+  }
+  @media (min-width: 600px) and (max-width: 700px) {
+    #comBlurb {
+      position: absolute;
+      top: 15%;
+      right: 5%;
+      left:20%;
+      width:auto;
+      padding: 20px;
+      font-size: 16px;
+      background-color: #f4485d;
+      color: #efd641;
+      z-index: 5;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .frame {
+    width: calc(100% / 2 - 15px);
+  }
+  #SpotlightLeft, #SpotlightRight{
+    bottom:-7%;
+  }
+}
+
+
+
+
+@media(max-width:800px){
+  #leaf{
+    width:25%;
+  }
+  .navButton{
+    background:none;
+    padding:5px;
+    text-decoration:none;
+    font-family: "coolvetica", sans-serif;
+    font-weight: 700;
+    font-size:12px;
+    font-style: normal;
+    color:white;
+    font-family: "botanika-mono-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+  }
+  #TLIllustration{
+    position:absolute;
+    top:0;
+    left:5px;
+    z-index:1;
+    width:60%;
+  }
+  #redIndexImage{
+    top:-50px;
+    width:25%;
+  }
+  .carousel-container {
+    position: relative; /* For positioning buttons */
+    overflow: hidden;   /* Hide images that are out of view */
+    max-width: 100%;    /* Make it responsive within its container */
+    margin-top:40px;
+    margin-right: 2%;
+    margin-left: 2%;
+    z-index:3;
+  }
+  .footer{
+    background-color:#343F3E;
+    padding-left:10%;
+    height:200px;
+    padding-bottom:20px;
+    h3{
+      color:white;
+      white-space:nowrap;
+      width:fit-content;
+      padding:8px;
+      background-color:#419645;
+    }
+  }
+  
+  .footerNav{
+    width:fit-content;
+    padding:6px;
+    background-color:#efd641;
+    height:fit-content;
+    margin-top:30px;
+    margin-right:10px;
+    font-size:12px;
+  }
+  .footerFlex{
+    display:flex;
+    flex-flow:row;
+  }
+  .contactIcon{
+    width:20px;
+    margin-right:10px;
+    height:auto;
+    display:block;
+  }
+    .BlogHeaderBackground{
+      width:70%;
+      
+      h1{
+        font-family: "botanika-mono-web", monospace;
+        font-weight: 500;
+        font-style: normal;
+        color:#2f9938;
+        font-size:16px;
+        margin-bottom:1px;
+      }
+      h2{
+        font-size:12px;
+      }
+    }
+  #BlogPostNextButton, #BlogPostBackButton{
+    position:relative;
+    background-color:#2f9938;
+    padding:5px;
+    z-index:15;
+    font-size:14px;
+  }
+  #blogList{
+    padding-right:10px;
+  }
+  #blogItem{
+    box-shadow:10px 10px black;
+  }
+  #indexNav{
+    margin-bottom:80px;
+  }
+  #titleCard{
+    position:absolute;
+    z-index:16;
+    left:50%;
+    top:-30px;
+    transform: translateX(-50%);
+    width:30%;
+    object-fit:cover;
+  }
+}
+@media(max-width:1000px){
+  .footer{
+    padding-left:20%;
+    
+    height:200px;
+    h3{
+      color:white;
+      white-space:nowrap;
+      width:fit-content;
+      padding:8px;
+      background-color:#419645;
+    }
+  }
+  .contacts{
+    display:flex;
+    flex-flow:column;
+    width:fit-content;
+    margin-left:auto;
+    margin-right:10px;
+    h3{
+      font-family: "botanika-mono-web", monospace;
+      font-weight: 500;
+      font-style: normal;
+      color:white;
+      font-size:12px;
+    }
+  }
+  .footerNav{
+    width:fit-content;
+    padding:6px;
+    background-color:#efd641;
+    height:fit-content;
+    margin-top:30px;
+    margin-right:10px;
+  }
+  .contactIcon{
+    width:30px;
+    margin-right:10px;
+    height:auto;
+    display:block;
+  }
+}
+@media (max-width: 600px) {
+  #redBug{
+    position: absolute;
+    bottom:calc(10% + 200px);
+    left:2%;
+    width:15%;
+  }
+  #CloudIllustration{
+    
+    top: 6%;
+    right:40px;
+  }
+  #indexNav{
+    margin-bottom:80px;
+  }
+  #titleCard{
+    position:absolute;
+    z-index:16;
+    left:50%;
+    top:20px;
+    width:30%;
+    transform: translateX(-50%);
+    object-fit:cover;
+  }
+  #titleSub{
+    font-size:15px;
+    line-height:0.5;
+  }
+  sub{
+    margin-left:30px;
+  }
+  .frame {
+    width: 100%;
+  }
+  .calendarNav{
+    font-size:30px;
+    margin-top:0;
+  }
+  #blogList{
+    width:100%;
+  }
+  #blogList li{
+    box-shadow:5px 5px black;
+  }
+  .blurb #blurbText {
+    font-size:16px;
+  }
+  .monthBox{
+    width:100%;
+  }
+  #redIndexImage{
+    width:25%;
+    top:-70px;
+    right:-5%;
+  }
+  #ForkNPlateDoor,
+  #ForkNplateLeftAccentImage,
+  #ForkNplateRightAccentImage,
+  #SpotlightLeft,
+  #SpotlightRight {
+    width: 60%;
+    position: static;
+    transform: none;
+    margin: 20px auto;
+    display: block;
+    z-index:5;
+  }
+  #ForkNplateLeftAccentImage,
+  #ForkNplateRightAccentImage{
+    margin-bottom:-5px;
+  }
+  #SpotlightLeft,
+  #SpotlightRight {
+    margin-top:-10px;
+  }
+
+  #redAccent,
+  #greenAccent {
+    display: none;
+  }
+
+  .sectionBox,
+  #communityBox {
+    width: 90%;
+    margin: 0 auto 20px auto;
+    text-align: center;
+  }
+
+  
+  #comBlurb.blurb {
+    padding:20px;
+    z-index:6;
+  }
+  #comBlurb {
+    font-size: 16px;
+    aspect-ratio: auto;
+    position: relative;
+    right: 0;
+    left:0;
+    bottom:0;
+    left:auto;
+    z-index:15;
+    width:calc(100vw - 40px);
+    overflow:hidden;
+  }
+  #blurbSurrounding{
+    margin-left:0;
+    width:99%;
+    margin-bottom:0px;
+  }
+  
+
+  .monthBox {
+    width: 100%;
+    margin: 40px auto 20px auto;
+  }
+
+  #communityCalendarBackground {
+    width: 100%;
+    padding-bottom: 100px;
+    margin-bottom:0;
+  }
+  #comTainer{
+    background-color:#419645;
+  }
+  .footer {
+    padding-left: 5%;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .footerFlex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footerNav,
+  .contacts {
+    margin: 10px 0;
+    font-size: 14px;
+  }
+
+  .contactIcons {
+    justify-content: center;
+  }
+
+  .contactIcon {
+    width: 30px;
+    margin: 5px;
+  }
+
+  #BlogTicket p {
+    width: 90%;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+
+  #blogItems {
+    padding: 0 10px;
+  }
+
+  .blogPreviewHead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  #community.date-box{
+    margin:1px;
+  }
+  
+}
+@media (max-width: 1000px) {
+  .blogHeaderWrapper {
+    position: relative;
+  }
+
+  #BlogHeaderBG {
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 2.04;
+    display: block;
+    position: relative;
+    z-index: 0;
+  }
+
+  .blogHeaderContent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 0px;
+  }
+
+  nav {
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    margin: 0 10px 10px 10px;
+  }
+
+  #BlogTicket {
+    width: 90%;
+    margin: 20px auto;
+    background-size: contain;
+    aspect-ratio: 2.49/1;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    margin-bottom:0;
+  }
+
+  #BlogTicket p {
+    font-size: 14px;
+    width: 90%;
+    margin: 0 auto;
+    margin-left:26%;
+    margin-right:8%;
+    margin-top:20px;
+  }
+
+  #blogList {
+    position: relative;
+    top: 0;
+    transform: none;
+    margin-top: 10px;
+    z-index: 1;
+    width:95%;
+    left:0;
+    background-color: #468caf;
+    padding-bottom:50px;
+    padding-top:20px;
+    h1{
+      margin-top:0;
+    }
+
+  }
+
+  #pencil {
+    width: 10%;
+    top: 10px;
+    right: 10px;
+  }
+  #blogFooter{
+    margin-top:60px;
+  }
+}
+@media (max-width: 600px) {
+  
+
+  #BlogTicket {
+    z-index: 3 !important;
+    margin-top: 20px;
+    position: relative;
+    width:100%;
+    top:68%;
+    p{
+      font-size:12px;
+      overflow-y:hidden;
+      margin-top:10px;
+    }
+  }
+
+  #blogList {
+    z-index: 1;
+    position: relative;
+    margin-top: 55px;
+    padding-left:10px;
+    padding-right:10px;
+    h1{
+      font-size:24px;
+    }
+  }
+  #blogFooter{
+    margin-top:0;
+  }
+  #blogTainer{
+    background-color:#efd641;
+  }
+}

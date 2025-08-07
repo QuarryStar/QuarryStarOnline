@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Table: {{ table_name }}</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    input[type="text"] {
+      width: 100%;
+    }
+    .add-row-form {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+   <h3>Instructions</h3>
+   <ul>
+    <li>Date Must Be in MM/DD/YYYY Format</li>
+    <li>Input image into Images folder on server (public/Images/)</li>
+    <li>Enter Image File Name</li>
+    <li>Add any extra info (Theme, Parking, Weather, etc.)</li>
+    <li>Top table is shows currently booked(can be deleted, or edited)</li>
+    <li>Bottom table is to add a show</li>
+    <li>Second Row in example is an example of a TBD date (A date where you could have a show but isn't booked) and provides a form for interested artists/venues</li>
+   </ul>
+   <h3>Example</h3>
+   <table>
+        <thead>
+            <tr>
+                <!-- Table Headers -->
+                <th>Venue</th>
+                <th>Address</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Ticket_Price</th>
+                <th>Artist1</th>
+                <th>Artist2</th>
+                <th>Artist3</th>
+                <th>Image_File_Path</th>
+                <th>Any_Extra_Info</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <!-- Table Data Cells -->
+                <td>The Root Cellar</td>
+                <td>108 E Kirkwood Ave, Bloomington, IN</td>
+                <td>06/22/2025</td>
+                <td>7:30pm</td>
+                <td>$8</td>
+                <td>Slug Rug</td>
+                <td>Mzzle</td>
+                <td>Ensifera</td>
+                <td>SlugRug.jpg</td>
+                <td>Wear Cowboy Boots</td>
+            </tr>
+            <tr>
+                <!-- Table Data Cells -->
+                <td>TBD</td>
+                <td></td>
+                <td>06/22/2025</td>
+                <td>AVAILABILITY(e.g. 7-10pm)</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+  <h2>Table: {{ table_name }}</h2>
+
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        {% for col in columns %}
+          <th>{{ col }}</th>
+        {% endfor %}
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for col in columns %}
+          <td contenteditable="true" 
+              onblur="updateCell('{{ table_name }}', '{{ col }}', this.innerText, '{{ row['rowid'] }}')">
+            {{ row[col] }}
+          </td>
+        {% endfor %}
+        <td><button onclick="deleteRow('{{ table_name }}', '{{ row['rowid'] }}')">Delete</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No rows in this table.</p>
+{% endif %}
+ 
+   <div class="add-row-form">
+    
+  <h3>Add New Row</h3>
+ 
+  <form id="addRowForm">
+    <table>
+      <tr>
+        {% for col in columns %}
+          <td>
+            <label><strong>{{ col }}</strong><br>
+              <input type="text" name="{{ col }}" placeholder="{{ col }}">
+            </label>
+          </td>
+        {% endfor %}
+        <td><button type="submit">Add Row</button></td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+
+
+
+  <br><a href="/admin">← Back to tables</a>
+
+  <script>
+    function updateCell(table, column, value, rowid) {
+      fetch('/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({ table, column, value, rowid })
+      }).then(res => {
+        if (!res.ok) alert("Failed to update");
+      });
+    }
+
+    function deleteRow(table, rowid) {
+      if (!confirm("Are you sure you want to delete this row?")) return;
+
+      fetch('/delete_row', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({ table, rowid })
+      }).then(res => {
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert("Failed to delete row");
+        }
+      });
+    }
+
+    document.getElementById('addRowForm')?.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      formData.append('table', '{{ table_name }}');
+
+      fetch('/add_row', {
+        method: 'POST',
+        body: formData
+      }).then(res => {
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert("Failed to add row");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

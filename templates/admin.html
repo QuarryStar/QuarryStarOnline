@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Admin</title></head>
+<body>
+  <h2>Tables in DB</h2>
+  <ul>
+    {% for table in tables %}
+      <li><a href="{{ url_for('view_table', table_name=table[0]) }}">{{ table[0] }}</a></li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
