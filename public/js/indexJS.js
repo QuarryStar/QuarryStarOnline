@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
     async function fetchBlogItems() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/blog');
+            const response = await fetch('/api/blog');
             return await response.json();
         } catch (error) {
             console.error('Error fetching bookings:', error);
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     })
     async function fetchBookings() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/Communitybookings');
+            const response = await fetch('/api/Communitybookings');
             return await response.json();
         } catch (error) {
             console.error('Error fetching bookings:', error);
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
     async function fetchForkBookings() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/bookings');
+            const response = await fetch('/api/bookings');
             return await response.json();
         } catch (error) {
             console.error('Error fetching bookings:', error);

@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addItemMessage = document.getElementById('addItemMessage');
     const itemsList = document.getElementById('itemsList');
 
-    const API_BASE_URL = 'http://localhost:5000/api'; // Adjust if your server is on a different port/domain
+    const API_BASE_URL = '/api'; // Adjust if your server is on a different port/domain
 
     // --- Helper Functions ---
     function showMessage(element, message, type) {

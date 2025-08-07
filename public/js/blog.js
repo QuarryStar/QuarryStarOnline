@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded",async function(){
 
     async function fetchBlogItems() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/blog');
+            const response = await fetch('/api/blog');
             return await response.json();
         } catch (error) {
             console.error('Error fetching bookings:', error);
