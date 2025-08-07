@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask import jsonify
 from flask_cors import CORS
 import sqlite3
 import os
 
-app= Flask(__name__)
+app= Flask(__name__, static_folder="public")
 CORS(app)
 app.secret_key = os.urandom(24)
 
@@ -39,8 +39,13 @@ def get_table_columns(table):
 
 # Routes
 @app.route('/')
-def home():
-    return redirect('/login')
+def public_index():
+    # Serves public/index.html
+    return send_from_directory(app.static_folder, "index.html")
+
+@app.route("/<path:path>")
+def public_files(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
