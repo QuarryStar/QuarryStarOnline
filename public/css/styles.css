@@ -1248,6 +1248,18 @@ nav{
   }
 }
 @media (max-width: 600px) {
+  #evDate{
+    background-color:white;
+    font-size:12px;
+    width:fit-content;
+    padding:0 5px;
+      
+    font-weight:bold;
+  }
+  
+  #communityMonthScroller{
+    font-size:50px;
+  }
   #redBug{
     position: absolute;
     bottom:calc(10% + 200px);
@@ -1266,7 +1278,7 @@ nav{
     position:absolute;
     z-index:16;
     left:50%;
-    top:20px;
+    top:40px;
     width:30%;
     transform: translateX(-50%);
     object-fit:cover;

@@ -351,7 +351,7 @@ async function calendarMaker(mm, monthText, year) {
         dateObject.innerHTML = `
             <div class="eventBox" id="event" style="background-image: url('Images/${event.Image_FilePath}');">
                 <p id="evDate">${startDate}</p>
-            <h4 id=""evDate>${event.Artist}</h4>
+            <h4 id="evDate">${event.Artist}</h4>
             </div>
             <div class="eventSlideOver hidden">
             <p>${event.Date}</p>
