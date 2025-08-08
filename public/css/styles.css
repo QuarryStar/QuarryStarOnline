@@ -1248,6 +1248,11 @@ nav{
   }
 }
 @media (max-width: 600px) {
+  .eventBox, #event{
+    p, h4{
+      font-size:12px;
+    }
+  }
   #evDate{
     background-color:white;
     font-size:12px;
