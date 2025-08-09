@@ -15,6 +15,7 @@ Botanika Mono SemiBold Italic
 font-family: "botanika-mono-web", monospace;
 font-weight: 600;
 font-style: italic; */
+:root { color-scheme: light; }
 h1, h2, h3, h4, h5{
   font-family: "coolvetica", sans-serif;
   font-weight: 700;

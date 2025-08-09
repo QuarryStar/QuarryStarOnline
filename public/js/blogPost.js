@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async function(){
         document.getElementById("BlogPostAuthor").textContent = post.Author;
         var htmlBuilder="";
         if (post.Type === "zine") {
-            const pdfPath = `images/blogImages/${post.Image1Filepath}`;
+            const pdfPath = `Images/BlogImages/${post.Image1Filepath}`;
 
             // Function to check PDF inline support
             function supportsPDFs() {
