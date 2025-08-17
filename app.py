@@ -5,7 +5,13 @@ from flask_cors import CORS
 import sqlite3
 import os
 
+
 app= Flask(__name__, static_folder="public")
+app.config.update(
+    SESSION_COOKIE_SECURE=True,        # Ensures cookies only sent over HTTPS
+    SESSION_COOKIE_HTTPONLY=True,      # Protects against JavaScript access
+    SESSION_COOKIE_SAMESITE="Lax"      # Helps prevent CSRF
+)
 CORS(app)
 app.secret_key = os.urandom(24)
 
