@@ -77,8 +77,11 @@ document.addEventListener('DOMContentLoaded', async function(){
                 }
             }
             else if(filename=="forkLink"){
-                if(soonest.Artist=="TBD"){
-                    div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/TBDImage.jpg)"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                if(soonest==null){
+                    div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/TBDImage.jpg)"><h1>Upcoming</h1><h2>TBD</h2><p>Fork+Plate</p></a>`
+                }
+                else if(soonest.Artist=="TBD"){
+                    div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/TBDImage.jpg)"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>Fork+Plate</p></a>`
 
                 }
                 else{
