@@ -4,13 +4,23 @@ from flask import jsonify
 from flask_cors import CORS
 import sqlite3
 import os
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 
 app= Flask(__name__, static_folder="public")
 app.config.update(
-    SESSION_COOKIE_SECURE=True,        # Ensures cookies only sent over HTTPS
-    SESSION_COOKIE_HTTPONLY=True,      # Protects against JavaScript access
-    SESSION_COOKIE_SAMESITE="Lax"      # Helps prevent CSRF
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=True, 
+    SESSION_COOKIE_DOMAIN=".quarrystar.online"         # required on the public internet
+)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,      # trust X-Forwarded-For
+    x_proto=1,    # trust X-Forwarded-Proto (https)
+    x_host=1,     # trust X-Forwarded-Host
+    x_port=1
 )
 CORS(app)
 app.secret_key = os.urandom(24)
@@ -56,12 +66,26 @@ def public_files(path):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if (request.form['username'] == VALID_USERNAME and 
-            request.form['password'] == VALID_PASSWORD):
-            user = User(1)
-            login_user(user)
-            return redirect('/admin')
+        # accept either form or JSON
+        data = request.get_json(silent=True) or {}
+        username = request.form.get('username') or data.get('username', '')
+        password = request.form.get('password') or data.get('password', '')
+
+        if username == VALID_USERNAME and password == VALID_PASSWORD:
+            login_user(User(1), remember=True)
+
+            # If this was a JSON/XHR login, return JSON (no redirect)
+            if request.is_json:
+                return jsonify({"ok": True})
+
+            # If this was a normal HTML form post, redirect
+            return redirect(url_for('admin'))
+
+        # Bad creds: JSON gets JSON, form gets plain 401 text
+        if request.is_json:
+            return jsonify({"ok": False, "error": "invalid_credentials"}), 401
         return "Invalid credentials", 401
+
     return render_template('login.html')
 
 @app.route('/logout')
