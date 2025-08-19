@@ -8,32 +8,82 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 
-app= Flask(__name__, static_folder="public")
+app = Flask(__name__, static_folder="public")
+
+# use a stable secret in prod (env var); fallback if missing:
+app.secret_key = os.environ.get("SECRET_KEY", "dev-insecure-change-me")
+
+# cookies: public HTTPS, same-origin site
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=True, 
-    SESSION_COOKIE_DOMAIN=".quarrystar.online"         # required on the public internet
+    SESSION_COOKIE_SECURE=True,
 )
-app.wsgi_app = ProxyFix(
-    app.wsgi_app,
-    x_for=1,      # trust X-Forwarded-For
-    x_proto=1,    # trust X-Forwarded-Proto (https)
-    x_host=1,     # trust X-Forwarded-Host
-    x_port=1
-)
-CORS(app)
-app.secret_key = os.urandom(24)
 
-# Authentication setup
+# if you’re behind Fly.io / a reverse proxy, trust forwarded headers
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
 login_manager = LoginManager()
+login_manager.login_view = "login_page"  # for HTML page redirects
 login_manager.init_app(app)
-login_manager.login_view = 'login'
 
-# Simple hardcoded user
+# Return 401 JSON for API calls, but keep redirect for page views
+@login_manager.unauthorized_handler
+def _unauth():
+    if request.path.startswith("/api/"):
+        return jsonify({"message": "unauthorized"}), 401
+    # keep the classic redirect with next=
+    return redirect(url_for("login_page", next=request.url))
+
+
+# --- your User model (example) ---
 class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, user_id):
+        self.id = user_id
+        self.name = "admin"
+
+# Replace these with your real credentials / lookup
+VALID_USERNAME = os.environ.get("ADMIN_USER", "admin")
+VALID_PASSWORD = os.environ.get("ADMIN_PASS", "password")
+
+
+# ------------------ AUTH ROUTES ------------------
+
+# HTML login page (GET only)
+@app.get("/login")
+def login_page():
+    return render_template("login.html")
+
+# One JSON login endpoint your JS will call
+@app.post("/api/login")
+def api_login():
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "")
+    password = data.get("password", "")
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        login_user(User(1), remember=True)   # sets session cookie; do NOT set cookies manually
+        return jsonify({"ok": True})
+    return jsonify({"ok": False, "error": "invalid_credentials"}), 401
+
+@app.post("/api/logout")
+@login_required
+def api_logout():
+    logout_user()
+    return jsonify({"ok": True})
+
+@app.get("/api/me")
+def api_me():
+    if current_user.is_authenticated:
+        return jsonify({"ok": True, "user": getattr(current_user, "name", "user")})
+    return jsonify({"ok": False}), 401
+
+
+# Protect your admin page with Flask-Login cookie
+@app.get("/admin")
+@login_required
+def admin():
+    return render_template("admin.html")
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -63,46 +113,46 @@ def public_index():
 def public_files(path):
     return send_from_directory(app.static_folder, path)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # accept either form or JSON
-        data = request.get_json(silent=True) or {}
-        username = request.form.get('username') or data.get('username', '')
-        password = request.form.get('password') or data.get('password', '')
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         # accept either form or JSON
+#         data = request.get_json(silent=True) or {}
+#         username = request.form.get('username') or data.get('username', '')
+#         password = request.form.get('password') or data.get('password', '')
 
-        if username == VALID_USERNAME and password == VALID_PASSWORD:
-            login_user(User(1), remember=True)
+#         if username == VALID_USERNAME and password == VALID_PASSWORD:
+#             login_user(User(1), remember=True)
 
-            # If this was a JSON/XHR login, return JSON (no redirect)
-            if request.is_json:
-                return jsonify({"ok": True})
+#             # If this was a JSON/XHR login, return JSON (no redirect)
+#             if request.is_json:
+#                 return jsonify({"ok": True})
 
-            # If this was a normal HTML form post, redirect
-            return redirect(url_for('admin'))
+#             # If this was a normal HTML form post, redirect
+#             return redirect(url_for('admin'))
 
-        # Bad creds: JSON gets JSON, form gets plain 401 text
-        if request.is_json:
-            return jsonify({"ok": False, "error": "invalid_credentials"}), 401
-        return "Invalid credentials", 401
+#         # Bad creds: JSON gets JSON, form gets plain 401 text
+#         if request.is_json:
+#             return jsonify({"ok": False, "error": "invalid_credentials"}), 401
+#         return "Invalid credentials", 401
 
-    return render_template('login.html')
+#     return render_template('login.html')
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect('/login')
+# @app.route('/logout')
+# @login_required
+# def logout():
+#     logout_user()
+#     return redirect('/login')
 
-@app.route('/admin')
-@login_required
-def admin():
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
-    c = conn.cursor()
-    c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tables = c.fetchall()
-    conn.close()
-    return render_template('admin.html', tables=tables)
+# @app.route('/admin')
+# @login_required
+# def admin():
+#     conn = sqlite3.connect('Databases/Bookings-FP.db')
+#     c = conn.cursor()
+#     c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+#     tables = c.fetchall()
+#     conn.close()
+#     return render_template('admin.html', tables=tables)
 
 @app.route('/table/<table_name>')
 @login_required

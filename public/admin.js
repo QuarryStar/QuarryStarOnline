@@ -1,207 +1,136 @@
-'use strict'
-document.addEventListener('DOMContentLoaded', function() {
-    const authSection = document.getElementById('authSection');
-    const adminSection = document.getElementById('adminSection');
-    const authForm = document.getElementById('authForm');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    const authMessage = document.getElementById('authMessage');
-    const logoutButton = document.getElementById('logoutButton');
+'use strict';
 
-    const addItemForm = document.getElementById('addItemForm');
-    const itemNameInput = document.getElementById('itemName');
-    const addItemMessage = document.getElementById('addItemMessage');
-    const itemsList = document.getElementById('itemsList');
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM
+  const authSection   = document.getElementById('authSection');
+  const adminSection  = document.getElementById('adminSection');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginBtn      = document.getElementById('loginBtn');
+  const logoutButton  = document.getElementById('logoutButton');
 
-    const API_BASE_URL = '/api'; // Adjust if your server is on a different port/domain
+  const addItemForm   = document.getElementById('addItemForm');
+  const itemNameInput = document.getElementById('itemName');
 
-    // --- Helper Functions ---
-    function showMessage(element, message, type) {
-        element.textContent = message;
-        element.className = `message ${type}`;
-        element.style.display = 'block';
-        setTimeout(() => {
-            element.style.display = 'none';
-        }, 3000);
+  const authMessage   = document.getElementById('authMessage');
+  const addItemMessage= document.getElementById('addItemMessage');
+  const itemsList     = document.getElementById('itemsList');
+
+  // helpers
+  function showMessage(el, text, type='info') {
+    if (!el) return;
+    el.textContent = text;
+    el.className = type; // style by [success|error|info]
+  }
+
+  async function isAuthed() {
+    try {
+      const r = await fetch('/api/me', { credentials: 'include' });
+      return r.ok;
+    } catch {
+      return false;
     }
+  }
 
-    function getToken() {
-        return localStorage.getItem('authToken');
+  async function updateUI() {
+    const ok = await isAuthed();
+    if (ok) {
+      authSection.style.display  = 'none';
+      adminSection.style.display = 'block';
+      await fetchItems();
+    } else {
+      authSection.style.display  = 'block';
+      adminSection.style.display = 'none';
     }
+  }
 
-    function setToken(token) {
-        localStorage.setItem('authToken', token);
-    }
-
-    function removeToken() {
-        localStorage.removeItem('authToken');
-    }
-
-    // --- UI State Management ---
-    function updateUI() {
-        const token = getToken();
-        if (token) {
-            authSection.style.display = 'none';
-            adminSection.style.display = 'block';
-            fetchItems(); // Load items if authenticated
-        } else {
-            authSection.style.display = 'block';
-            adminSection.style.display = 'none';
-        }
-    }
-
-    // --- API Calls ---
-    async function authRequest(endpoint, data) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            return response; // Return the full response object
-        } catch (error) {
-            console.error(`Error during ${endpoint}:`, error);
-            showMessage(authMessage, `Network error during ${endpoint}.`, 'error');
-            return null;
-        }
-    }
-
-    async function protectedRequest(endpoint, method = 'GET', data = null) {
-        const token = getToken();
-        if (!token) {
-            showMessage(addItemMessage, 'Not authenticated. Please log in.', 'error');
-            updateUI(); // Redirect to login if no token
-            return null;
-        }
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-
-        const config = {
-            method: method,
-            headers: headers
-        };
-        if (data) {
-            config.body = JSON.stringify(data);
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/${endpoint}`, config);
-
-            if (response.status === 401 || response.status === 403) {
-                removeToken(); // Token expired or invalid
-                showMessage(addItemMessage, 'Session expired or unauthorized. Please log in again.', 'error');
-                updateUI();
-                return null;
-            }
-            return response;
-        } catch (error) {
-            console.error(`Error during ${endpoint} ${method}:`, error);
-            showMessage(addItemMessage, `Network error during ${endpoint} ${method}.`, 'error');
-            return null;
-        }
-    }
-
-    async function fetchItems() {
-        itemsList.innerHTML = 'Loading items...';
-        const response = await protectedRequest('items', 'GET');
-        if (response && response.ok) {
-            const items = await response.json();
-            itemsList.innerHTML = ''; // Clear loading message
-            if (items.length === 0) {
-                itemsList.innerHTML = '<li>No items found.</li>';
-            } else {
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span>${item.name}</span>
-                        <button data-id="${item.id}">Delete</button>
-                    `;
-                    li.querySelector('button').addEventListener('click', deleteItem);
-                    itemsList.appendChild(li);
-                });
-            }
-        } else if (response) {
-            const errorData = await response.json();
-            showMessage(addItemMessage, `Failed to load items: ${errorData.message || response.statusText}`, 'error');
-        }
-    }
-
-    async function addItem(event) {
-        event.preventDefault();
-        const itemName = itemNameInput.value.trim();
-        if (!itemName) {
-            showMessage(addItemMessage, 'Item name cannot be empty.', 'error');
-            return;
-        }
-
-        const response = await protectedRequest('items', 'POST', { name: itemName });
-        if (response && response.ok) {
-            const data = await response.json();
-            showMessage(addItemMessage, `Item "${data.name}" added successfully!`, 'success');
-            itemNameInput.value = '';
-            fetchItems(); // Refresh list
-        } else if (response) {
-            const errorData = await response.json();
-            showMessage(addItemMessage, `Failed to add item: ${errorData.message || response.statusText}`, 'error');
-        }
-    }
-
-    async function deleteItem(event) {
-        const itemId = event.target.dataset.id;
-        if (!confirm(`Are you sure you want to delete item ID ${itemId}?`)) {
-            return;
-        }
-
-        const response = await protectedRequest(`items/${itemId}`, 'DELETE');
-        if (response && response.ok) {
-            const data = await response.json();
-            showMessage(addItemMessage, data.message, 'success');
-            fetchItems(); // Refresh list
-        } else if (response) {
-            const errorData = await response.json();
-            showMessage(addItemMessage, `Failed to delete item: ${errorData.message || response.statusText}`, 'error');
-        }
-    }
-
-    // --- Event Listeners ---
-    authForm.addEventListener('submit', async function(event) {
-        event.preventDefault(); // Prevent default form submission
-        // This form handles both login and register based on which button was clicked
+  // API wrappers (cookies!)
+  async function apiPost(path, bodyObj) {
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(bodyObj || {})
     });
+    return res;
+  }
 
-    loginBtn.addEventListener('click', async function() {
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-        const response = await authRequest('login', { username, password });
-
-        if (response && response.ok) {
-            const data = await response.json();
-            setToken(data.token);
-            showMessage(authMessage, data.message, 'success');
-            usernameInput.value = '';
-            passwordInput.value = '';
-            updateUI();
-        } else if (response) {
-            const errorData = await response.json();
-            showMessage(authMessage, errorData.message || 'Login failed.', 'error');
-        }
+  async function apiGet(path) {
+    const res = await fetch(path, {
+      method: 'GET',
+      credentials: 'include'
     });
+    return res;
+  }
 
-    logoutButton.addEventListener('click', function() {
-        removeToken();
-        showMessage(authMessage, 'Logged out successfully.', 'success');
-        updateUI();
+  // login/logout
+  loginBtn.addEventListener('click', async () => {
+    const username = (usernameInput.value || '').trim();
+    const password = (passwordInput.value || '').trim();
+
+    if (!username || !password) {
+      showMessage(authMessage, 'Enter username and password', 'error');
+      return;
+    }
+
+    const r = await apiPost('/api/login', { username, password });
+    if (r.ok) {
+      showMessage(authMessage, 'Logged in', 'success');
+      usernameInput.value = '';
+      passwordInput.value = '';
+      await updateUI();
+    } else {
+      const err = await r.json().catch(() => ({}));
+      showMessage(authMessage, err.error || 'Login failed', 'error');
+    }
+  });
+
+  logoutButton.addEventListener('click', async () => {
+    await apiPost('/api/logout', {});
+    showMessage(authMessage, 'Logged out', 'success');
+    await updateUI();
+  });
+
+  // example protected calls
+  async function fetchItems() {
+    if (!itemsList) return;
+    itemsList.innerHTML = '';
+    const r = await apiGet('/api/items');      // <-- keep your existing endpoint
+    if (r.status === 401) {
+      showMessage(addItemMessage, 'Please log in.', 'error');
+      await updateUI();
+      return;
+    }
+    if (!r.ok) {
+      showMessage(addItemMessage, 'Failed to load items.', 'error');
+      return;
+    }
+    const items = await r.json();
+    items.forEach(it => {
+      const li = document.createElement('li');
+      li.textContent = it.name || JSON.stringify(it);
+      itemsList.appendChild(li);
     });
+  }
 
-    addItemForm.addEventListener('submit', addItem);
+  addItemForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = (itemNameInput.value || '').trim();
+    if (!name) return;
 
-    // Initial UI update on page load
-    updateUI();
+    const r = await apiPost('/api/items', { name }); // <-- your existing POST endpoint
+    if (r.ok) {
+      showMessage(addItemMessage, 'Added', 'success');
+      itemNameInput.value = '';
+      await fetchItems();
+    } else if (r.status === 401) {
+      showMessage(addItemMessage, 'Please log in.', 'error');
+      await updateUI();
+    } else {
+      showMessage(addItemMessage, 'Add failed.', 'error');
+    }
+  });
+
+  // boot
+  updateUI();
 });
