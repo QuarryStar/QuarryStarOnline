@@ -50,20 +50,30 @@ VALID_PASSWORD = os.environ.get("ADMIN_PASS", "password")
 # ------------------ AUTH ROUTES ------------------
 
 # HTML login page (GET only)
-@app.get("/login")
+@app.route('/login', methods=['GET', 'POST'])
 def login_page():
-    return render_template("login.html")
+    if request.method == 'GET':
+        return render_template('login.html')
 
-# One JSON login endpoint your JS will call
-@app.post("/api/login")
+    # POST: form submit
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        login_user(User(1), remember=True)
+        next_url = request.args.get('next') or url_for('admin')
+        return redirect(next_url)
+    # (optional) re-render page with an error message
+    return render_template('login.html', error='Invalid credentials'), 401
+
+
+# Keep JSON login for fetch-based logins
+@app.post('/api/login')
 def api_login():
     data = request.get_json(silent=True) or {}
-    username = data.get("username", "")
-    password = data.get("password", "")
-    if username == VALID_USERNAME and password == VALID_PASSWORD:
-        login_user(User(1), remember=True)   # sets session cookie; do NOT set cookies manually
-        return jsonify({"ok": True})
-    return jsonify({"ok": False, "error": "invalid_credentials"}), 401
+    if data.get('username') == VALID_USERNAME and data.get('password') == VALID_PASSWORD:
+        login_user(User(1), remember=True)
+        return jsonify({'ok': True})
+    return jsonify({'ok': False, 'error': 'invalid_credentials'}), 401
 
 @app.post("/api/logout")
 @login_required

@@ -22,7 +22,31 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = text;
     el.className = type; // style by [success|error|info]
   }
+  const loginForm = document.getElementById('loginForm'); // <form id="loginForm">...</form>
 
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // stop default GET submit
+            const username = (usernameInput.value || '').trim();
+            const password = (passwordInput.value || '').trim();
+            if (!username || !password) { showMessage(authMessage, 'Enter username and password', 'error'); return; }
+
+            const r = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ username, password })
+            });
+            if (r.ok) {
+            showMessage(authMessage, 'Logged in', 'success');
+            usernameInput.value = ''; passwordInput.value = '';
+            await updateUI();
+            } else {
+            const err = await r.json().catch(() => ({}));
+            showMessage(authMessage, err.error || 'Login failed', 'error');
+            }
+        });
+    }
   async function isAuthed() {
     try {
       const r = await fetch('/api/me', { credentials: 'include' });
