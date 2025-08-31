@@ -332,8 +332,9 @@ def api_bookings():
         return jsonify({"error": "Failed to load bookings"}), 500
     finally:
         conn.close()
+
 @app.route('/api/carousel')
-def api_bookings():
+def api_carousel():
     print("[DEBUG] /api/carousel was hit!")
     conn = sqlite3.connect('Databases/Bookings-FP.db')
     conn.row_factory = sqlite3.Row
@@ -349,6 +350,7 @@ def api_bookings():
         return jsonify({"error": "Failed to load Carousel"}), 500
     finally:
         conn.close()
+
 @app.route('/api/Communitybookings')
 def api_Communitybookings():
     print("[DEBUG] /api/Communitybookings was hit!")
