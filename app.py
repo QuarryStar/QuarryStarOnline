@@ -297,10 +297,11 @@ def add_row():
 
 
 
-def quote_ident(s: str) -> str:
-    if not isinstance(s, str):
-        raise ValueError("Bad identifier")
-    return '"' + s.replace('"','""') + '"'
+def quote_ident(name: str) -> str:
+    # minimal identifier quoting for SQLite: "double up" any embedded double quotes
+    if not isinstance(name, str):
+        raise ValueError("Identifier must be a string")
+    return '"' + name.replace('"', '""') + '"'
 
 @app.route('/update', methods=['POST'])
 @login_required
