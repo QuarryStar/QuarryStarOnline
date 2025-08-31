@@ -239,7 +239,7 @@ def view_table(table_name):
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    tq = f'"{table_name.replace("\"","\"\"")}"'
+    tq = quote_ident(table_name)
 
     # Find columns + primary key (supports single-column PK cleanly)
     c.execute(f"PRAGMA table_info({tq})")
