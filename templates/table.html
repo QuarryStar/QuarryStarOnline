@@ -104,11 +104,13 @@
     <p>No rows in this table.</p>
   {% endif %}
  
-   <div class="add-row-form">
-    
+<div class="add-row-form">
   <h3>Add New Row</h3>
- 
-  <form id="addRowForm">
+
+  <form method="POST" action="/add_row">
+    <!-- must tell the server which table -->
+    <input type="hidden" name="table" value="{{ table_name }}">
+
     <table>
       <tr>
         {% for col in columns %}
