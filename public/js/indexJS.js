@@ -68,14 +68,18 @@ document.addEventListener('DOMContentLoaded', async function(){
             const div = document.createElement('div');
             div.classList.add("frame");
             if(filename=="blogLink"){
-                const blogg = blogItems[0];
-                const encodedTitle = encodeURIComponent(blogg.id);
-                if(blogg.Type=="zine"){
-                    div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>Check Out The Latest Edition Of The Telecast Zine Here!</p></a>`
+                if(blogItems.length>0){
+                    const blogg = blogItems[0];
+                    const encodedTitle = encodeURIComponent(blogg.id);
+                    if(blogg.Type=="zine"){
+                        div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>Check Out The Latest Edition Of The Telecast Zine Here!</p></a>`
+                    }
+                    else{
+                        div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>${blogg.Paragraph1.substring(0,150)}...</p></a>`
+                    }
+                    
                 }
-                else{
-                    div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>${blogg.Paragraph1.substring(0,150)}...</p></a>`
-                }
+                
             }
             else if(filename=="forkLink"){
                 if(soonest==null){

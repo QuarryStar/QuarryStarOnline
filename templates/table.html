@@ -77,33 +77,35 @@
   <h2>Table: {{ table_name }}</h2>
 
   {% if rows %}
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
+    <table>
+      <thead>
+        <tr>
+          {% for col in columns %}
+            <th>{{ col }}</th>
+          {% endfor %}
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        {% set keycol = pk if pk else 'id' %}  {# fallback if needed #}
+        {% set keyval = row[keycol] %}
+        <tr data-table="{{ table_name }}" data-keycol="{{ keycol }}" data-keyval="{{ keyval }}">
+          {% for col in columns %}
+            {% set keycol = pk if pk else 'id' %}
+            {% set keyval = row[keycol] %}
+            <td contenteditable="true"
+                onblur="updateCell('{{ table_name }}','{{ col }}', this.innerText, '{{ keycol }}','{{ keyval }}')">
+              {{ row[col] }}
+            </td>
+            <td><button onclick="deleteRow('{{ table_name }}','{{ keycol }}','{{ keyval }}')">Delete</button></td>
+        </tr>
         {% endfor %}
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in rows %}
-      {% set rid = row['rowid'] if 'rowid' in row else row['id'] %}
-      <tr>
-        {% for col in columns %}
-          <td contenteditable="true"
-              onblur="updateCell('{{ table_name }}','{{ col }}', this.innerText, '{{ rid }}')">
-            {{ row[col] }}
-          </td>
-        {% endfor %}
-        <td><button onclick="deleteRow('{{ table_name }}','{{ rid }}')">Delete</button></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p>No rows in this table.</p>
-{% endif %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No rows in this table.</p>
+  {% endif %}
  
    <div class="add-row-form">
     
@@ -131,48 +133,24 @@
   <br><a href="/admin">← Back to tables</a>
 
   <script>
-    function updateCell(table, column, value, rowid) {
+    function updateCell(table, column, value, keycol, keyval) {
       fetch('/update', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({ table, column, value, rowid })
-      }).then(res => {
-        if (!res.ok) alert("Failed to update");
-      });
+        body: new URLSearchParams({ table, column, value, keycol, keyval })
+      }).then(res => { if (!res.ok) alert("Failed to update"); });
     }
 
-    function deleteRow(table, rowid) {
+    function deleteRow(table, keycol, keyval) {
       if (!confirm("Are you sure you want to delete this row?")) return;
-
       fetch('/delete_row', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({ table, rowid })
-      }).then(res => {
-        if (res.ok) {
-          window.location.reload();
-        } else {
-          alert("Failed to delete row");
-        }
-      });
+        body: new URLSearchParams({ table, keycol, keyval })
+      }).then(res => { if (res.ok) location.reload(); else alert("Failed to delete row"); });
     }
 
-    document.getElementById('addRowForm')?.addEventListener('submit', function(event) {
-      event.preventDefault();
-      const formData = new FormData(this);
-      formData.append('table', '{{ table_name }}');
-
-      fetch('/add_row', {
-        method: 'POST',
-        body: formData
-      }).then(res => {
-        if (res.ok) {
-          window.location.reload();
-        } else {
-          alert("Failed to add row");
-        }
-      });
-    });
+    // your addRowForm handler can stay as-is
   </script>
 </body>
 </html>

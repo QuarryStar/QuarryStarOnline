@@ -234,38 +234,37 @@ def logout():
 @app.route('/table/<table_name>')
 @login_required
 def view_table(table_name):
+    import sqlite3
     conn = sqlite3.connect('Databases/Bookings-FP.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    # Get columns
-    c.execute(f"PRAGMA table_info({table_name})")
-    columns_info = c.fetchall()
-    columns = [col[1] for col in columns_info]  # column[1] = column name
+    tq = f'"{table_name.replace("\"","\"\"")}"'
 
-    # Get data
-    c.execute(f"SELECT rowid, * FROM {table_name}")
+    # Find columns + primary key (supports single-column PK cleanly)
+    c.execute(f"PRAGMA table_info({tq})")
+    cols = c.fetchall()
+    columns = [r[1] for r in cols]              # column names
+    pk_cols = [r[1] for r in cols if r[5] > 0]  # r[5] is pk position (>0 if part of PK)
+
+    # (If you know they’re single-column PKs, the next line is safe)
+    pk = pk_cols[0] if len(pk_cols) == 1 else None
+
+    c.execute(f"SELECT * FROM {tq}")
     rows = c.fetchall()
-
     conn.close()
-    return render_template('table.html', table_name=table_name, rows=rows, columns=columns)
+
+    return render_template(
+        'table.html',
+        table_name=table_name,
+        rows=rows,
+        columns=columns,
+        pk=pk,                 # e.g. "id"
+        pk_cols=pk_cols        # in case you later add composite support
+    )
 
 
-@app.route('/update', methods=['POST'])
-@login_required
-def update_table():
-    table = request.form['table']
-    column = request.form['column']
-    value = request.form['value']
-    rowid = request.form['rowid']
 
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
-    c = conn.cursor()
-    query = f"UPDATE {table} SET {column} = ? WHERE rowid = ?"
-    c.execute(query, (value, rowid))
-    conn.commit()
-    conn.close()
-    return "Updated", 200
 
 @app.route('/add_row', methods=['POST'])
 @login_required
@@ -298,23 +297,59 @@ def add_row():
 
 
 
-@app.route('/delete_row', methods=['POST'])
+def quote_ident(s: str) -> str:
+    if not isinstance(s, str):
+        raise ValueError("Bad identifier")
+    return '"' + s.replace('"','""') + '"'
+
+@app.route('/update', methods=['POST'])
 @login_required
-def delete_row():
-    table = request.form['table']
-    rowid = request.form['rowid']
+def update_table():
+    table  = request.form['table']
+    column = request.form['column']
+    value  = request.form['value']
+    keycol = request.form['keycol']
+    keyval = request.form['keyval']
+
+    tq = quote_ident(table)
+    cq = quote_ident(column)
+    kq = quote_ident(keycol)
+
+    import sqlite3
     conn = sqlite3.connect('Databases/Bookings-FP.db')
     c = conn.cursor()
     try:
-        c.execute(f"DELETE FROM {table} WHERE rowid = ?", (rowid,))
+        c.execute(f"UPDATE {tq} SET {cq} = ? WHERE {kq} = ?", (value, keyval))
         conn.commit()
-        return "Row deleted", 200
+        return "OK", 200
     except Exception as e:
-        print("[ERROR]", e)
-        return "Failed to delete", 400
+        print("[UPDATE ERROR]", e)
+        return "Failed", 400
     finally:
         conn.close()
 
+@app.route('/delete_row', methods=['POST'])
+@login_required
+def delete_row():
+    table  = request.form['table']
+    keycol = request.form['keycol']
+    keyval = request.form['keyval']
+
+    tq = quote_ident(table)
+    kq = quote_ident(keycol)
+
+    import sqlite3
+    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    c = conn.cursor()
+    try:
+        c.execute(f"DELETE FROM {tq} WHERE {kq} = ?", (keyval,))
+        conn.commit()
+        return "OK", 200
+    except Exception as e:
+        print("[DELETE ERROR]", e)
+        return "Failed", 400
+    finally:
+        conn.close()
 @app.route('/api/bookings')
 def api_bookings():
     print("[DEBUG] /api/bookings was hit!")
