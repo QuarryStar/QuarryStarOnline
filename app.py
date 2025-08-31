@@ -6,9 +6,67 @@ import sqlite3
 import os
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-
-
 app = Flask(__name__, static_folder="public")
+
+
+import traceback
+from jinja2 import TemplateNotFound, UndefinedError
+from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login_page"  # if you have a /login page
+
+# User model + loader (ensures session can be restored across requests)
+class User(UserMixin):
+    def __init__(self, user_id, username="admin"):
+        self.id = str(user_id)
+        self.name = username
+        self.username = username  # some templates expect username
+
+@login_manager.user_loader
+def load_user(user_id: str):
+    # TODO: replace with your real lookup if you have one
+    return User(user_id)
+
+# Return JSON for unauth API calls; keep redirect for page views
+@login_manager.unauthorized_handler
+def _unauth():
+    from flask import request, jsonify, redirect, url_for
+    if request.path.startswith("/api/"):
+        return jsonify({"message": "unauthorized"}), 401
+    return redirect(url_for("login_page", next=request.url))
+
+# --- TEMP DIAGNOSTIC admin route wrapper ---
+from flask import render_template
+
+@app.get("/admin")
+@login_required
+def admin():
+    try:
+        # If your template is named differently, change this:
+        return render_template("admin.html")
+    except TemplateNotFound as e:
+        # Most common production 500: wrong template path/name
+        return (
+            f"Template not found: {e.name}\n"
+            f"Put your admin template at templates/admin.html (or set app.template_folder).",
+            500, {"Content-Type": "text/plain; charset=utf-8"}
+        )
+    except UndefinedError as e:
+        # Second most common: template references a var you didn't pass
+        return (
+            "Jinja variable missing/undefined in admin.html:\n"
+            f"{e}\n\n"
+            "Fix: pass the variable from the route (render_template('admin.html', var=...)) "
+            "or guard in Jinja: {% if var %} ... {% endif %}.",
+            500, {"Content-Type": "text/plain; charset=utf-8"}
+        )
+    except Exception:
+        # Show full stack so you know the exact line failing (DB path, etc.)
+        tb = traceback.format_exc()
+        return (f"Unhandled error in /admin:\n\n{tb}",
+                500, {"Content-Type": "text/plain; charset=utf-8"})
 
 # use a stable secret in prod (env var); fallback if missing:
 app.secret_key = os.environ.get("SECRET_KEY", "dev-insecure-change-me")
