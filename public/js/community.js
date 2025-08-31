@@ -178,7 +178,13 @@ document.addEventListener('DOMContentLoaded', function(){
                     if (ev.Artist == "TBD") {
                         eventBox.style.backgroundImage = "url('Images/TBDImage.jpg')";
                     } else {
-                        eventBox.style.backgroundImage = "url('Images/" + ev.Image_File_Path + "')";
+                        if(ev.Image_File_Path.substring(0,4)=="http"){
+                            eventBox.style.backgroundImage = `url( ${ev.Image_File_Path})`;
+                        }
+                        else{
+                            eventBox.style.backgroundImage = "url('Images/" + ev.Image_File_Path + "')";
+                        }
+                        
                     }
 
                     if (eventNum == 0) {

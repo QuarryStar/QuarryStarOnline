@@ -3,6 +3,7 @@
 const params = new URLSearchParams(window.location.search);
 const title = params.get("title");
 document.addEventListener("DOMContentLoaded", async function(){
+    
     const prevButton = document.getElementById("BlogPostBackButton");
     const nextButton = document.getElementById("BlogPostNextButton");
     async function fetchBlogItems() {

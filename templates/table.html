@@ -87,14 +87,15 @@
     </thead>
     <tbody>
       {% for row in rows %}
+      {% set rid = row['rowid'] if 'rowid' in row else row['id'] %}
       <tr>
         {% for col in columns %}
-          <td contenteditable="true" 
-              onblur="updateCell('{{ table_name }}', '{{ col }}', this.innerText, '{{ row['rowid'] }}')">
+          <td contenteditable="true"
+              onblur="updateCell('{{ table_name }}','{{ col }}', this.innerText, '{{ rid }}')">
             {{ row[col] }}
           </td>
         {% endfor %}
-        <td><button onclick="deleteRow('{{ table_name }}', '{{ row['rowid'] }}')">Delete</button></td>
+        <td><button onclick="deleteRow('{{ table_name }}','{{ rid }}')">Delete</button></td>
       </tr>
       {% endfor %}
     </tbody>
