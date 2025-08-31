@@ -234,35 +234,57 @@ def logout():
 @app.route('/table/<table_name>')
 @login_required
 def view_table(table_name):
-    import sqlite3
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
+    import os, sqlite3, traceback
 
-    tq = quote_ident(table_name)
+    DB_PATH = os.path.join(os.path.dirname(__file__), 'Databases', 'Bookings-FP.db')
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
 
-    # Find columns + primary key (supports single-column PK cleanly)
-    c.execute(f"PRAGMA table_info({tq})")
-    cols = c.fetchall()
-    columns = [r[1] for r in cols]              # column names
-    pk_cols = [r[1] for r in cols if r[5] > 0]  # r[5] is pk position (>0 if part of PK)
+        tq = quote_ident(table_name)
 
-    # (If you know they’re single-column PKs, the next line is safe)
-    pk = pk_cols[0] if len(pk_cols) == 1 else None
+        # Get columns and PK info
+        c.execute(f"PRAGMA table_info({tq})")
+        cols = c.fetchall()
+        if not cols:
+            return f"Table '{table_name}' not found or has no columns.", 400
 
-    c.execute(f"SELECT * FROM {tq}")
-    rows = c.fetchall()
-    conn.close()
+        columns = [r[1] for r in cols]             # column names
+        pk_cols = [r[1] for r in cols if r[5] > 0] # r[5] > 0 => part of PK
 
-    return render_template(
-        'table.html',
-        table_name=table_name,
-        rows=rows,
-        columns=columns,
-        pk=pk,                 # e.g. "id"
-        pk_cols=pk_cols        # in case you later add composite support
-    )
+        if len(pk_cols) != 1:
+            # You said all tables you edit have a single PK—fail fast if not true
+            return f"Table '{table_name}' does not have a single-column primary key.", 400
 
+        pk = pk_cols[0]
+
+        # Fetch some rows
+        c.execute(f"SELECT * FROM {tq} LIMIT 200")
+        rows = [dict(r) for r in c.fetchall()]   # convert to dicts for Jinja
+
+        return render_template(
+            'table.html',
+            table_name=table_name,
+            rows=rows,
+            columns=columns,
+            pk=pk,
+            pk_cols=pk_cols
+        )
+
+    except sqlite3.OperationalError as e:
+        print("[VIEW_TABLE OperationalError]", e)
+        traceback.print_exc()
+        return f"Could not open table '{table_name}': {e}", 400
+    except Exception as e:
+        print("[VIEW_TABLE ERROR]", e)
+        traceback.print_exc()
+        return "Internal server error.", 500
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 

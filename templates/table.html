@@ -86,22 +86,19 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        {% for row in rows %}
-        {% set keycol = pk if pk else 'id' %}  {# fallback if needed #}
-        {% set keyval = row[keycol] %}
-        <tr data-table="{{ table_name }}" data-keycol="{{ keycol }}" data-keyval="{{ keyval }}">
-          {% for col in columns %}
-            {% set keycol = pk if pk else 'id' %}
-            {% set keyval = row[keycol] %}
-            <td contenteditable="true"
-                onblur="updateCell('{{ table_name }}','{{ col }}', this.innerText, '{{ keycol }}','{{ keyval }}')">
-              {{ row[col] }}
-            </td>
-            <td><button onclick="deleteRow('{{ table_name }}','{{ keycol }}','{{ keyval }}')">Delete</button></td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      {% if pk %}
+      {# example edit/delete actions using single PK #}
+      {% for row in rows %}
+        <form method="post" action="/update">
+          <input type="hidden" name="table" value="{{ table_name }}">
+          <input type="hidden" name="keycol" value="{{ pk }}">
+          <input type="hidden" name="keyval" value="{{ row[pk] }}">
+          ...
+        </form>
+      {% endfor %}
+    {% else %}
+      <div class="alert">This table isn’t supported: no single-column primary key.</div>
+    {% endif %}
     </table>
   {% else %}
     <p>No rows in this table.</p>
