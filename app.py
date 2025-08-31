@@ -332,7 +332,23 @@ def api_bookings():
         return jsonify({"error": "Failed to load bookings"}), 500
     finally:
         conn.close()
-
+@app.route('/api/carousel')
+def api_bookings():
+    print("[DEBUG] /api/carousel was hit!")
+    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    try:
+        c.execute('SELECT rowid, * FROM "Carousel"')
+        rows = c.fetchall()
+        data = [dict(row) for row in rows]
+        print(f"[DEBUG] Returning {len(data)} Images")
+        return jsonify(data)
+    except Exception as e:
+        print(f"[ERROR] Fetching Carousel failed: {e}")
+        return jsonify({"error": "Failed to load Carousel"}), 500
+    finally:
+        conn.close()
 @app.route('/api/Communitybookings')
 def api_Communitybookings():
     print("[DEBUG] /api/Communitybookings was hit!")

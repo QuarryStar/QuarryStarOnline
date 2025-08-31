@@ -9,15 +9,15 @@ document.addEventListener('DOMContentLoaded', async function(){
     let items = document.querySelectorAll('.carousel .carousel-item')
     const carouselContainer = document.querySelector('.carousel-container');
     const carouselTrack = document.querySelector('.carousel-track');
+
     const imageFilenames = [
         'forkLink',
-        'blogLink',
-        'image1.jpg',
-        'image2.jpg',
-        'image3.jpg',
-        'image4.jpg'
-        
+        'blogLink'
     ];
+    const carouselImages=await fetchCarousel();
+    carouselImages.forEach(image =>{
+        imageFilenames.push(image.FilePath);
+    })
     function matchHemiHeight() {
         const about = document.querySelector('.aboutBackground');
         const hemi = document.querySelector('.hemi');
@@ -97,7 +97,12 @@ document.addEventListener('DOMContentLoaded', async function(){
 
             }
             else{
-                div.innerHTML=`<img class='carouselImage' src='Images/Carousel/${filename}' alt='${filename}'>`;
+                if(filename.substring(0,4)=="http"){
+                    div.innerHTML=`<img class='carouselImage' src='${filename}' alt='${filename}'>`;
+                }
+                else{
+                    div.innerHTML=`<img class='carouselImage' src='Images/Carousel/${filename}' alt='${filename}'>`;
+                }
             }
             carouselTrack.appendChild(div);
             images.push(div);
@@ -253,6 +258,15 @@ document.addEventListener('DOMContentLoaded', async function(){
     async function fetchBookings() {
         try {
             const response = await fetch('/api/Communitybookings');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+            return [];
+        }
+    }
+    async function fetchCarousel(){
+        try {
+            const response = await fetch('/api/carousel');
             return await response.json();
         } catch (error) {
             console.error('Error fetching bookings:', error);
