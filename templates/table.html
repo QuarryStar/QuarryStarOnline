@@ -76,34 +76,64 @@
     </table>
   <h2>Table: {{ table_name }}</h2>
 
-  {% if rows %}
-    <table>
-      <thead>
-        <tr>
-          {% for col in columns %}
-            <th>{{ col }}</th>
+    {% if rows %}
+      <table>
+        <thead>
+          <tr>
+            {% for col in columns %}
+              <th>{{ col }}</th>
+            {% endfor %}
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr data-table="{{ table_name }}" data-rid="{{ row[pk] if pk else '' }}">
+              {% for col in columns %}
+                <td
+                  {% if pk and col != pk %}
+                    contenteditable="true"
+                    onblur='updateCell(
+                      "{{ table_name }}",
+                      "{{ col }}",
+                      this.innerText,
+                      "{{ pk }}",
+                      "{{ row[pk] }}"
+                    )'
+                  {% endif %}
+                >
+                  {# Show the cell value. Use default('') so missing/null doesn’t crash. #}
+                  {% set val = row[col] | default('') %}
+                  {# Tiny nicety: if this is your image column, show an image preview. #}
+                  {% if col == "Image_File_Path" and val %}
+                    {% if "http" in val %}
+                      <img src="{{ val }}{% if '?' not in val %}?raw=true{% endif %}" alt="{{ val }}" style="max-width:120px; max-height:80px;">
+                    {% else %}
+                      <img src="/Images/{{ val }}" alt="{{ val }}" style="max-width:120px; max-height:80px;">
+                    {% endif %}
+                    <div style="font-size:12px; color:#444;">{{ val }}</div>
+                  {% else %}
+                    {{ val }}
+                  {% endif %}
+                </td>
+              {% endfor %}
+              <td>
+                {% if pk %}
+                  <button type="button"
+                          onclick='deleteRow("{{ table_name }}","{{ pk }}","{{ row[pk] }}")'>
+                    Delete
+                  </button>
+                {% else %}
+                  <em>No PK</em>
+                {% endif %}
+              </td>
+            </tr>
           {% endfor %}
-          <th>Actions</th>
-        </tr>
-      </thead>
-      {% if pk %}
-      {# example edit/delete actions using single PK #}
-      {% for row in rows %}
-        <form method="post" action="/update">
-          <input type="hidden" name="table" value="{{ table_name }}">
-          <input type="hidden" name="keycol" value="{{ pk }}">
-          <input type="hidden" name="keyval" value="{{ row[pk] }}">
-          ...
-        </form>
-      {% endfor %}
+        </tbody>
+      </table>
     {% else %}
-      <div class="alert">This table isn’t supported: no single-column primary key.</div>
+      <p>No rows in this table.</p>
     {% endif %}
-    </table>
-  {% else %}
-    <p>No rows in this table.</p>
-  {% endif %}
- 
 <div class="add-row-form">
   <h3>Add New Row</h3>
 

@@ -362,6 +362,24 @@ def delete_row():
     finally:
         conn.close()
 
+@app.route('/api/bookings')
+def api_bookings():
+    print("[DEBUG] /api/bookings was hit!")
+    conn = open_conn()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    try:
+        c.execute('SELECT rowid, * FROM "Bookings"')
+        rows = c.fetchall()
+        data = [dict(row) for row in rows]
+        print(f"[DEBUG] Returning {len(data)} bookings")
+        return jsonify(data)
+    except Exception as e:
+        print(f"[ERROR] Fetching bookings failed: {e}")
+        return jsonify({"error": "Failed to load bookings"}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/carousel')
 def api_carousel():
     print("[DEBUG] /api/carousel was hit!")
