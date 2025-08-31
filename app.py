@@ -260,26 +260,40 @@ def view_table(table_name):
 def add_row():
     table = request.form['table']
 
-    # Filter out 'table' and any empty 'id' field
-    columns = [key for key in request.form if key != 'table' and not (key == 'id' and request.form[key].strip() == '')]
-    values = [request.form[key] for key in columns]
+    # Discover the PK name for this table
+    conn = open_conn()
+    c = conn.cursor()
+    tq = quote_ident(table)
+    c.execute(f"PRAGMA table_info({tq})")
+    cols = c.fetchall()
+    pk_cols = [r[1] for r in cols if r[5] > 0]
+    pk = pk_cols[0] if pk_cols else None  # you enforce single-PK elsewhere
+
+    # Build columns/values from form, skipping:
+    # - the hidden 'table' field
+    # - the PK if it is blank (let SQLite autoincrement)
+    columns = []
+    values = []
+    for key, val in request.form.items():
+        if key == 'table':
+            continue
+        if pk and key == pk and (val is None or val.strip() == ''):
+            continue
+        columns.append(key)
+        values.append(val)
 
     quoted_columns = ', '.join([f'"{col}"' for col in columns])
     placeholders = ', '.join(['?'] * len(values))
     query = f'INSERT INTO "{table}" ({quoted_columns}) VALUES ({placeholders})'
 
-    print(f"[DEBUG] Running query: {query}")
-    print(f"[DEBUG] Values: {values}")
-
-    # Execute the query
-    conn = open_conn()
-    c = conn.cursor()
     try:
         c.execute(query, values)
         conn.commit()
-        return "Row added", 200
+        # redirect back to the table page so you SEE the new row
+        return redirect(url_for('view_table', table_name=table), code=303)
     except Exception as e:
-        print("[ERROR]", e)
+        print("[ERROR add_row]", e)
+        conn.rollback()
         return "Failed to add row", 400
     finally:
         conn.close()

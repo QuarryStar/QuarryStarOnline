@@ -114,11 +114,13 @@
     <table>
       <tr>
         {% for col in columns %}
-          <td>
-            <label><strong>{{ col }}</strong><br>
-              <input type="text" name="{{ col }}" placeholder="{{ col }}">
-            </label>
-          </td>
+          {% if col != pk %}
+            <td>
+              <label><strong>{{ col }}</strong><br>
+                <input type="text" name="{{ col }}" placeholder="{{ col }}">
+              </label>
+            </td>
+          {% endif %}
         {% endfor %}
         <td><button type="submit">Add Row</button></td>
       </tr>
