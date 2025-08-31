@@ -10,12 +10,13 @@ document.addEventListener('DOMContentLoaded', async function(){
     const carouselContainer = document.querySelector('.carousel-container');
     const carouselTrack = document.querySelector('.carousel-track');
     const imageFilenames = [
+        'forkLink',
+        'blogLink',
         'image1.jpg',
         'image2.jpg',
         'image3.jpg',
-        'image4.jpg',
-        'blogLink',
-        'forkLink'
+        'image4.jpg'
+        
     ];
     function matchHemiHeight() {
         const about = document.querySelector('.aboutBackground');
@@ -85,7 +86,13 @@ document.addEventListener('DOMContentLoaded', async function(){
 
                 }
                 else{
-                    div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                    if(soonest.Image_File_Path.substring(0,4)=="http"){
+                        div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+
+                    }
+                    else{
+                        div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                    }
                 }
 
             }
@@ -351,19 +358,36 @@ async function calendarMaker(mm, monthText, year) {
         `;
       }
       else{
-        dateObject.innerHTML = `
-            <div class="eventBox" id="event" style="background-image: url('Images/${event.Image_FilePath}');">
-                <p id="evDate">${startDate}</p>
-            <h4 id="evDate">${event.Artist}</h4>
-            </div>
-            <div class="eventSlideOver hidden">
-            <p>${event.Date}</p>
-            <p>${event.Time}</p>
-            <p>${event.Venue}</p>
-            <address>${event.Address}</address>
-            <p>${event.TicketPrice}</p>
-            </div>
-        `;
+        if(event.Image_File_Path.substring(0,4)=="http"){
+            dateObject.innerHTML = `
+                <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath}');">
+                    <p id="evDate">${startDate}</p>
+                <h4 id="evDate">${event.Artist}</h4>
+                </div>
+                <div class="eventSlideOver hidden">
+                <p>${event.Date}</p>
+                <p>${event.Time}</p>
+                <p>${event.Venue}</p>
+                <address>${event.Address}</address>
+                <p>${event.TicketPrice}</p>
+                </div>
+            `;
+        }
+        else{
+            dateObject.innerHTML = `
+                <div class="eventBox" id="event" style="background-image: url('Images/${event.Image_FilePath}');">
+                    <p id="evDate">${startDate}</p>
+                <h4 id="evDate">${event.Artist}</h4>
+                </div>
+                <div class="eventSlideOver hidden">
+                <p>${event.Date}</p>
+                <p>${event.Time}</p>
+                <p>${event.Venue}</p>
+                <address>${event.Address}</address>
+                <p>${event.TicketPrice}</p>
+                </div>
+            `;
+        }
       }
         
       dateObject.addEventListener("mouseover", () => {

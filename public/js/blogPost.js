@@ -69,7 +69,13 @@ document.addEventListener("DOMContentLoaded", async function(){
         document.getElementById("BlogPostAuthor").textContent = post.Author;
         var htmlBuilder="";
         if (post.Type === "zine") {
-            const pdfPath = `Images/BlogImages/${post.Image1Filepath}`;
+            if(post.Image1Filepath.substring(0,4)=="http"){
+                const pdfPath = `${post.Image1Filepath}`;
+            }
+            else{
+                const pdfPath = `Images/BlogImages/${post.Image1Filepath}`;
+            }
+            
 
             // Function to check PDF inline support
             function supportsPDFs() {
@@ -123,14 +129,30 @@ document.addEventListener("DOMContentLoaded", async function(){
                 htmlBuilder+="</p>"
             }
             if(post.Image1Filepath){
-                htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image1Filepath}" alt="Blog Image">`
+                if(post.Image1Filepath.substring(0,4)=="http"){
+                    htmlBuilder+=`<img class="BPImage" src="${post.Image1Filepath}" alt="Blog Image">`
+
+                }
+                else{
+                    htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image1Filepath}" alt="Blog Image">`
+                }
             }
             if(post.Image2Filepath){
-                htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image2Filepath}" alt="Blog Image">`
+                if(post.Image2Filepath.substring(0,4)=="http"){
+                    htmlBuilder+=`<img class="BPImage" src="${post.Image2Filepath}" alt="Blog Image">`
+                }
+                else{
+                    htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image2Filepath}" alt="Blog Image">`
+                }
             }
             if(post.Image3Filepath){
-                htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image3Filepath}" alt="Blog Image">`
-            }
+                if(post.Image3Filepath.substring(0,4)=="http"){
+                    htmlBuilder+=`<img class="BPImage" src="${post.Image3Filepath}" alt="Blog Image">`
+
+                }
+                else{
+                    htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image3Filepath}" alt="Blog Image">`
+                }            }
             if(htmlBuilder!=""){
                 document.getElementById("blogPostBody").innerHTML=htmlBuilder;
             }
