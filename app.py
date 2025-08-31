@@ -8,7 +8,12 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__, static_folder="public")
 
+DB_PATH = os.path.join(os.path.dirname(__file__), 'Databases', 'Bookings-FP.db')
 
+def open_conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 import traceback
 from jinja2 import TemplateNotFound, UndefinedError
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
@@ -45,7 +50,7 @@ from flask import render_template
 def admin():
     try:
         # If your template is named differently, change this:
-        conn = sqlite3.connect('Databases/Bookings-FP.db')
+        conn = open_conn()
         c = conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = c.fetchall()
@@ -167,7 +172,7 @@ VALID_USERNAME = "admin"
 VALID_PASSWORD = "ButtF8rtStinky"
 
 def get_table_columns(table):
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     c = conn.cursor()
     c.execute(f"PRAGMA table_info({table})")
     columns = [row[1] for row in c.fetchall()]
@@ -186,50 +191,12 @@ def public_index():
 def public_files(path):
     return send_from_directory(app.static_folder, path)
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         # accept either form or JSON
-#         data = request.get_json(silent=True) or {}
-#         username = request.form.get('username') or data.get('username', '')
-#         password = request.form.get('password') or data.get('password', '')
-
-#         if username == VALID_USERNAME and password == VALID_PASSWORD:
-#             login_user(User(1), remember=True)
-
-#             # If this was a JSON/XHR login, return JSON (no redirect)
-#             if request.is_json:
-#                 return jsonify({"ok": True})
-
-#             # If this was a normal HTML form post, redirect
-#             return redirect(url_for('admin'))
-
-#         # Bad creds: JSON gets JSON, form gets plain 401 text
-#         if request.is_json:
-#             return jsonify({"ok": False, "error": "invalid_credentials"}), 401
-#         return "Invalid credentials", 401
-
-#     return render_template('login.html')
-
-# @app.route('/logout')
-# @login_required
-# def logout():
-#     logout_user()
-#     return redirect('/login')
 @app.get("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("login_page"))
-# @app.route('/admin')
-# @login_required
-# def admin():
-#     conn = sqlite3.connect('Databases/Bookings-FP.db')
-#     c = conn.cursor()
-#     c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-#     tables = c.fetchall()
-#     conn.close()
-#     return render_template('admin.html', tables=tables)
+
 
 @app.route('/table/<table_name>')
 @login_required
@@ -305,7 +272,7 @@ def add_row():
     print(f"[DEBUG] Values: {values}")
 
     # Execute the query
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     c = conn.cursor()
     try:
         c.execute(query, values)
@@ -325,6 +292,7 @@ def quote_ident(name: str) -> str:
         raise ValueError("Identifier must be a string")
     return '"' + name.replace('"', '""') + '"'
 
+
 @app.route('/update', methods=['POST'])
 @login_required
 def update_table():
@@ -338,12 +306,15 @@ def update_table():
     cq = quote_ident(column)
     kq = quote_ident(keycol)
 
-    import sqlite3
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     c = conn.cursor()
     try:
         c.execute(f"UPDATE {tq} SET {cq} = ? WHERE {kq} = ?", (value, keyval))
         conn.commit()
+        changed = c.rowcount  # how many rows updated
+        print(f"[UPDATE] DB={DB_PATH} rows_changed={changed}")
+        if changed == 0:
+            return "No rows updated (check key).", 404
         return "OK", 200
     except Exception as e:
         print("[UPDATE ERROR]", e)
@@ -361,40 +332,26 @@ def delete_row():
     tq = quote_ident(table)
     kq = quote_ident(keycol)
 
-    import sqlite3
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     c = conn.cursor()
     try:
         c.execute(f"DELETE FROM {tq} WHERE {kq} = ?", (keyval,))
         conn.commit()
+        changed = c.rowcount
+        print(f"[DELETE] DB={DB_PATH} rows_changed={changed}")
+        if changed == 0:
+            return "No rows deleted (check key).", 404
         return "OK", 200
     except Exception as e:
         print("[DELETE ERROR]", e)
         return "Failed", 400
     finally:
         conn.close()
-@app.route('/api/bookings')
-def api_bookings():
-    print("[DEBUG] /api/bookings was hit!")
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
-    try:
-        c.execute('SELECT rowid, * FROM "Bookings"')
-        rows = c.fetchall()
-        data = [dict(row) for row in rows]
-        print(f"[DEBUG] Returning {len(data)} bookings")
-        return jsonify(data)
-    except Exception as e:
-        print(f"[ERROR] Fetching bookings failed: {e}")
-        return jsonify({"error": "Failed to load bookings"}), 500
-    finally:
-        conn.close()
 
 @app.route('/api/carousel')
 def api_carousel():
     print("[DEBUG] /api/carousel was hit!")
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try:
@@ -412,7 +369,7 @@ def api_carousel():
 @app.route('/api/Communitybookings')
 def api_Communitybookings():
     print("[DEBUG] /api/Communitybookings was hit!")
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try:
@@ -429,7 +386,7 @@ def api_Communitybookings():
 
 @app.route('/api/blog')
 def api_blog():
-    conn = sqlite3.connect('Databases/Bookings-FP.db')
+    conn = open_conn()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try:
