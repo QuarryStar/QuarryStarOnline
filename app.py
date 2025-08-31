@@ -147,10 +147,10 @@ def api_me():
 
 
 # Protect your admin page with Flask-Login cookie
-@app.get("/admin")
-@login_required
-def admin():
-    return render_template("admin.html")
+# @app.get("/admin")
+# @login_required
+# def admin():
+#     return render_template("admin.html")
 
 
 @login_manager.user_loader
@@ -211,7 +211,11 @@ def public_files(path):
 # def logout():
 #     logout_user()
 #     return redirect('/login')
-
+@app.get("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login_page"))
 # @app.route('/admin')
 # @login_required
 # def admin():
