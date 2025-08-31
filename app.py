@@ -45,7 +45,12 @@ from flask import render_template
 def admin():
     try:
         # If your template is named differently, change this:
-        return render_template("admin.html")
+        conn = sqlite3.connect('Databases/Bookings-FP.db')
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = c.fetchall()
+        conn.close()
+        return render_template('admin.html', tables=tables)
     except TemplateNotFound as e:
         # Most common production 500: wrong template path/name
         return (
