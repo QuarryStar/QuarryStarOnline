@@ -384,7 +384,7 @@ async function calendarMaker(mm, monthText, year) {
       else{
         if(event.Image_FilePath.substring(0,4)=="http"){
             dateObject.innerHTML = `
-                <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath}');">
+                <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath});">
                     <p id="evDate">${startDate}</p>
                 <h4 id="evDate">${event.Artist1}</h4>
                 </div>
