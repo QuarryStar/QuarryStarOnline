@@ -1,6 +1,27 @@
 'use strict'
 
 
+async function fetchWithRetry(url, options = {}, retries = 3, backoff = 500) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetch(url, { cache: "no-store", ...options });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (i < retries) {
+        // wait a bit longer each time
+        const delay = backoff * Math.pow(2, i);
+        console.warn(`Fetch failed (${err.message}), retrying in ${delay}ms...`);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        console.error(`Fetch failed after ${retries + 1} attempts:`, err);
+        return [];
+      }
+    }
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', async function(){
     var today = new Date();
     var tomorrow = new Date(2025,5,1);
@@ -27,13 +48,14 @@ document.addEventListener('DOMContentLoaded', async function(){
         }
     }
     async function fetchBlogItems() {
-        try {
-            const response = await fetch('/api/blog');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            return [];
-        }
+        // try {
+        //     const response = await fetch('/api/blog');
+        //     return await response.json();
+        // } catch (error) {
+        //     console.error('Error fetching bookings:', error);
+        //     return [];
+        // }
+        return await fetchWithRetry('/api/blog')
     }
     const forkBookings = await fetchForkBookings();
     today.setHours(0, 0, 0, 0); // ignore time portion
@@ -266,31 +288,34 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     })
     async function fetchBookings() {
-        try {
-            const response = await fetch('/api/Communitybookings');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            return [];
-        }
+        // try {
+        //     const response = await fetch('/api/Communitybookings');
+        //     return await response.json();
+        // } catch (error) {
+        //     console.error('Error fetching bookings:', error);
+        //     return [];
+        // }
+        return await fetchWithRetry('/api/Communitybookings');
     }
     async function fetchCarousel(){
-        try {
-            const response = await fetch('/api/carousel');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            return [];
-        }
+        // try {
+        //     const response = await fetch('/api/carousel');
+        //     return await response.json();
+        // } catch (error) {
+        //     console.error('Error fetching bookings:', error);
+        //     return [];
+        // }
+        return await fetchWithRetry('/api/carousel');
     }
     async function fetchForkBookings() {
-        try {
-            const response = await fetch('/api/bookings');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            return [];
-        }
+        // try {
+        //     const response = await fetch('/api/bookings');
+        //     return await response.json();
+        // } catch (error) {
+        //     console.error('Error fetching bookings:', error);
+        //     return [];
+        // }
+        return await fetchWithRetry('/api/bookings');
     }
 
 async function calendarMaker(mm, monthText, year) {
