@@ -480,8 +480,8 @@ nav{
   margin:0;
   padding:0;
   color:#efd641;
-  padding:20px;
-  font-size:16px;
+  padding:8px;
+  font-size:14px;
   p{
     font-family: "pennypacker", sans-serif;
     font-weight: 800;
@@ -1031,8 +1031,8 @@ nav{
     right: 5%;
     left:30%;
     width:auto;
-    padding: 20px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 12px;
     background-color: #f4485d;
     color: #efd641;
     z-index: 5;

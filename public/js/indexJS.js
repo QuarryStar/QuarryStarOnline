@@ -367,7 +367,7 @@ async function calendarMaker(mm, monthText, year) {
     if (eventsToday.length) {
         console.log("True");
       const event = eventsToday[0];
-      if (event.Artist == "TBD"){
+      if (event.Artist1 == "TBD"){
         dateObject.innerHTML = `
             <div class="eventBox" id="event" style="background-image: url('Images/TBDImage.jpg');">
                 <p id="evDate">${startDate}</p>
@@ -386,7 +386,7 @@ async function calendarMaker(mm, monthText, year) {
             dateObject.innerHTML = `
                 <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath}');">
                     <p id="evDate">${startDate}</p>
-                <h4 id="evDate">${event.Artist}</h4>
+                <h4 id="evDate">${event.Artist1}</h4>
                 </div>
                 <div class="eventSlideOver hidden">
                 <p>${event.Date}</p>
@@ -401,7 +401,7 @@ async function calendarMaker(mm, monthText, year) {
             dateObject.innerHTML = `
                 <div class="eventBox" id="event" style="background-image: url('Images/${event.Image_FilePath}');">
                     <p id="evDate">${startDate}</p>
-                <h4 id="evDate">${event.Artist}</h4>
+                <h4 id="evDate">${event.Artist1}</h4>
                 </div>
                 <div class="eventSlideOver hidden">
                 <p>${event.Date}</p>
@@ -432,7 +432,7 @@ async function calendarMaker(mm, monthText, year) {
         }
         var myHTMLBuilder=""
         myHTMLBuilder+=`<div class="modalContent">
-                <h3 id="bandName">${event.Artist}</h3>`
+                <h3 id="bandName">${event.Artist1}</h3>`
         if(extraArtists.length>0){
             myHTMLBuilder+=`<div style="border: 2px solid #468caf; max-width:40%"><h4>${extraArtists[0]}</h4>`
             if(extraArtists.length>1){
@@ -440,7 +440,7 @@ async function calendarMaker(mm, monthText, year) {
             }
             myHTMLBuilder+="</div>"
         }
-        if(event.Artist == "TBD"){
+        if(event.Artist1 == "TBD"){
             myHTMLBuilder+=`
                 <p id="eventDate">${event.Date}</p>
                 <p id="eventTime">Open Times: ${event.Time}</p>
