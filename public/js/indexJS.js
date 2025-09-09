@@ -90,13 +90,19 @@ document.addEventListener('DOMContentLoaded', async function(){
 
                 }
                 else{
-                    if(soonest.Image_File_Path.substring(0,4)=="http"){
+                    if(soonest.Image_File_Path){
+                        if(soonest.Image_File_Path.substring(0,4)=="http"){
                         div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
 
                     }
-                    else{
-                        div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                        else{
+                            div.innerHTML=`<a href='fork+plate.html' class="forkLink" style="background-image:url(Images/${soonest.Image_File_Path})"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                        }
                     }
+                    else{
+                            div.innerHTML=`<a href='fork+plate.html' class="forkLink"><h1>${soonest.Artist}</h1><h2>${soonest.Date}</h2><p>${soonest.Venue}</p></a>`
+                    }
+                    
                 }
 
             }
@@ -376,7 +382,7 @@ async function calendarMaker(mm, monthText, year) {
         `;
       }
       else{
-        if(event.Image_File_Path.substring(0,4)=="http"){
+        if(event.Image_FilePath.substring(0,4)=="http"){
             dateObject.innerHTML = `
                 <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath}');">
                     <p id="evDate">${startDate}</p>
