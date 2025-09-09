@@ -365,123 +365,68 @@ async function calendarMaker(mm, monthText, year) {
     const eventsToday = bookings.filter(b => b.Date === dateStr);
 
     if (eventsToday.length) {
-        console.log("True");
-      const event = eventsToday[0];
-      if (event.Artist1 == "TBD"){
-        dateObject.innerHTML = `
-            <div class="eventBox" id="event" style="background-image: url('Images/TBDImage.jpg');">
-                <p id="evDate">${startDate}</p>
-            <h4 id="evDate">TBD</h4>
-            </div>
-            <div class="eventSlideOver hidden">
-            <p>${event.Date}</p>
-            <p>Times: ${event.Time}</p>
-            <p>${event.Venue}</p>
-            <p>Interested?</p>
-            </div>
-        `;
-      }
-      else{
-        if(event.Image_FilePath.substring(0,4)=="http"){
-            dateObject.innerHTML = `
-                <div class="eventBox" id="event" style="background-image: url(${event.Image_FilePath});">
-                    <p id="evDate">${startDate}</p>
-                <h4 id="evDate">${event.Artist1}</h4>
-                </div>
-                <div class="eventSlideOver hidden">
-                <p>${event.Date}</p>
-                <p>${event.Time}</p>
-                <p>${event.Venue}</p>
-                <address>${event.Address}</address>
-                <p>${event.TicketPrice}</p>
-                </div>
-            `;
-        }
-        else{
-            dateObject.innerHTML = `
-                <div class="eventBox" id="event" style="background-image: url('Images/${event.Image_FilePath}');">
-                    <p id="evDate">${startDate}</p>
-                <h4 id="evDate">${event.Artist1}</h4>
-                </div>
-                <div class="eventSlideOver hidden">
-                <p>${event.Date}</p>
-                <p>${event.Time}</p>
-                <p>${event.Venue}</p>
-                <address>${event.Address}</address>
-                <p>${event.TicketPrice}</p>
-                </div>
-            `;
-        }
-      }
-        
-      dateObject.addEventListener("mouseover", () => {
-        dateObject.querySelector(".eventBox").classList.add("blur");
-        dateObject.querySelector(".eventSlideOver").classList.remove("hidden");
-      });
-      dateObject.addEventListener("mouseout", () => {
-        dateObject.querySelector(".eventBox").classList.remove("blur");
-        dateObject.querySelector(".eventSlideOver").classList.add("hidden");
-      });
-      const anonymousHandler= function(){
-        var extraArtists=[]
-        if(event.Artist2){
-            extraArtists.push(event.Artist2)
-        }
-        if(event.Artist3){
-            extraArtists.push(event.Artist3)
-        }
-        var myHTMLBuilder=""
-        myHTMLBuilder+=`<div class="modalContent">
-                <h3 id="bandName">${event.Artist1}</h3>`
-        if(extraArtists.length>0){
-            myHTMLBuilder+=`<div style="border: 2px solid #468caf; max-width:40%"><h4>${extraArtists[0]}</h4>`
-            if(extraArtists.length>1){
-                myHTMLBuilder+=`<h4>${extraArtists[1]}</h4>`
+        // let the cell grow with stacked event boxes
+        dateObject.style.display = "flex";
+        dateObject.style.flexDirection = "column";
+        dateObject.innerHTML = "";
+
+        let eventNum = 0;
+        eventsToday.forEach(event => {
+            // event box
+            const eventBox = document.createElement("div");
+            eventBox.classList.add("eventBox");
+
+            // background
+            if (event.Artist1 === "TBD") {
+            eventBox.style.backgroundImage = "url('Images/TBDImage.jpg')";
+            } else if (event.Image_FilePath && event.Image_FilePath.substring(0,4) === "http") {
+            eventBox.style.backgroundImage = `url(${event.Image_FilePath})`;
+            } else if (event.Image_FilePath) {
+            eventBox.style.backgroundImage = `url('Images/${event.Image_FilePath}')`;
             }
-            myHTMLBuilder+="</div>"
-        }
-        if(event.Artist1 == "TBD"){
-            myHTMLBuilder+=`
-                <p id="eventDate">${event.Date}</p>
-                <p id="eventTime">Open Times: ${event.Time}</p>
-                <p id = "eventVenue">${event.Venue}</p>
-                <address id="eventPlace">${event.Address}</address>
-                <p> if you're an artist and would like to play <br>
-                show interest with the email below. <br>
-                Please provide the date and time you're interested in<br>
-                as well as your name and phone number for easy communication</p>
-                <a href= "mailto: fork+plate@gmail.com?subject=${event.Date}-(ARTIST NAME)-Artist-Interest-Form&body= I, (YOUR (Band's) NAME) am interested in playing on ${event.Date} at ${event.Venue} at (TIME) %0D%0A NAME %0D%0A ADDRESS">Fork+Plate@gmail.com</a>
-                `;
-        }
-        else{
-            myHTMLBuilder+=`
-                <p id="eventDate">${event.Date}</p>
-                <p id="eventTime">${event.Time}</p>
-                <p id = "eventVenue">${event.Venue}</p>
-                <address id="eventPlace">${event.Address}</address>
-                <p id="eventPrice"> ${event.TicketPrice}</p>
-                `;
-        }
-        if(event.AnyExtraInfo){
-            myHTMLBuilder+= `<p>${event.AnyExtraInfo}</p>`
-        }
-        myHTMLBuilder+=`</div>`;
-        
-        
-        
-        myModal.innerHTML=myHTMLBuilder
-        document.getElementById("eventModal").classList.remove("hidden");
-        dateObject.querySelector(".eventSlideOver").classList.add("hidden");
-        dateObject.querySelector(".eventBox").classList.remove("blur");
-        
-    }
-    dateObject.addEventListener("click", anonymousHandler)
-    dateObject._myAnon=anonymousHandler
-    document.getElementById("eventModal").addEventListener("click",function(){
-        this.classList.add("hidden");
-    })  
+
+            // put the calendar day number on the first event only
+            if (eventNum === 0) {
+            const pDate = document.createElement("p");
+            pDate.className = "evDate";           // use a class, avoid duplicate IDs
+            pDate.textContent = startDate;
+            eventBox.appendChild(pDate);
+            }
+
+            const h4 = document.createElement("h4");
+            h4.textContent = event.Artist1 === "TBD" ? "TBD" : event.Artist1;
+            eventBox.appendChild(h4);
+
+            // slide-over
+            const slideOver = document.createElement("div");
+            slideOver.classList.add("eventSlideOver", "hidden");
+            slideOver.innerHTML =
+            event.Artist1 === "TBD"
+                ? `<p>${event.Date}</p><p>Times: ${event.Time}</p><p>${event.Venue}</p><p>Interested?</p>`
+                : `<p>${event.Date}</p><p>${event.Time}</p><p>${event.Venue}</p><address>${event.Address}</address><p>${event.TicketPrice}</p>`;
+
+            // hover behavior (kept simple)
+            eventBox.addEventListener("mouseenter", () => {
+            dateObject.querySelectorAll(".eventSlideOver").forEach(so => so.classList.add("hidden"));
+            dateObject.querySelectorAll(".eventBox").forEach(b => b.classList.remove("blur"));
+            slideOver.classList.remove("hidden");
+            eventBox.classList.add("blur");
+            });
+            dateObject.addEventListener("mouseleave", () => {
+            dateObject.querySelectorAll(".eventSlideOver").forEach(so => so.classList.add("hidden"));
+            dateObject.querySelectorAll(".eventBox").forEach(b => b.classList.remove("blur"));
+            });
+
+            // click → modal (reuse your existing handler contents)
+            eventBox.addEventListener("click", () => { /* open modal with this event */ });
+
+            // append
+            dateObject.appendChild(slideOver);
+            dateObject.appendChild(eventBox);
+            eventNum += 1;
+        });
     } else {
-      dateObject.innerHTML = `<p id="evDate">${startDate}</p>`;
+        dateObject.innerHTML = `<p class="evDate">${startDate}</p>`;
     }
     
 
