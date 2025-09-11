@@ -20,6 +20,24 @@ async function fetchWithRetry(url, options = {}, retries = 3, backoff = 500) {
     }
   }
 }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// 3 attempts total; delays ~150ms, 300ms
+async function fetchQuick(url, options = {}, attempts = 3) {
+  let err;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(url, { cache: 'no-store', ...options });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    } catch (e) {
+      err = e;
+      if (i < attempts - 1) await sleep(150 * Math.pow(2, i));
+    }
+  }
+  throw err;
+}
+
 
 
 document.addEventListener('DOMContentLoaded', async function(){
@@ -35,7 +53,17 @@ document.addEventListener('DOMContentLoaded', async function(){
         'forkLink',
         'blogLink'
     ];
-    const carouselImages=await fetchCarousel();
+    // const [carouselP, bookingsP, blogP] = [
+    //     fetchQuick('/api/carousel'),
+    //     fetchQuick('/api/bookings'),
+    //     fetchQuick('/api/blog')
+    // ];
+
+  // render each as soon as it finishes (progressive)
+  carouselP.then(renderCarousel).catch(()=>{});
+  bookingsP.then(renderCalendar).catch(()=>{});
+  blogP.then(renderBlogList).catch(()=>{});
+    const carouselImages=await fetchQuick('/api/carousel');
     carouselImages.forEach(image =>{
         imageFilenames.push(image.FilePath);
     })
@@ -57,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         // }
         return await fetchWithRetry('/api/blog')
     }
-    const forkBookings = await fetchForkBookings();
+    const forkBookings = await fetchQuick('/api/bookings');
     today.setHours(0, 0, 0, 0); // ignore time portion
 
     const futureItems = forkBookings
@@ -77,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
 
     console.log(soonest);
-    const blogItems= await fetchBlogItems();
+    const blogItems= await fetchQuick('/api/blog')
     window.addEventListener('load', matchHemiHeight);
     window.addEventListener('resize', matchHemiHeight);
     let images = []; // We will populate this dynamically
@@ -366,7 +394,7 @@ async function calendarMaker(mm, monthText, year) {
                 <div class="date-box" data-day="37"></div>`
   }
   const DateObjects = document.getElementsByClassName("date-box");
-  const bookings = await fetchBookings();
+  const bookings = await fetchQuick('/api/Communitybookings');
     
   for (const dateObject of DateObjects) {
     console.log(calendarStart);

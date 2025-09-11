@@ -67,8 +67,16 @@ APP_READY = wait_for_db_ready()
 
 @app.get("/healthz")
 def healthz():
-    # Only say "healthy" when DB is really usable
-    return (jsonify({"ok": True}), 200) if APP_READY else (jsonify({"ok": False}), 503)
+    try:
+        with open_conn() as c:
+            # minimal reads that also create pages in cache
+            c.execute("SELECT 1 FROM Bookings LIMIT 1")
+            c.execute("SELECT 1 FROM CommunityBookings LIMIT 1")
+            c.execute("SELECT 1 FROM Carousel LIMIT 1")
+            c.execute("SELECT 1 FROM Blog LIMIT 1")
+        return {"ok": True}, 200
+    except Exception as e:
+        return {"ok": False, "err": str(e)}, 503
 import traceback
 from jinja2 import TemplateNotFound, UndefinedError
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
@@ -452,7 +460,7 @@ def api_bookings():
         return jsonify(data)
     except Exception as e:
         print(f"[ERROR] Fetching bookings failed: {e}")
-        return jsonify({"error": "Failed to load bookings"}), 500
+        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
     finally:
         conn.close()
 
@@ -470,7 +478,7 @@ def api_carousel():
         return jsonify(data)
     except Exception as e:
         print(f"[ERROR] Fetching Carousel failed: {e}")
-        return jsonify({"error": "Failed to load Carousel"}), 500
+        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
     finally:
         conn.close()
 
@@ -488,7 +496,7 @@ def api_Communitybookings():
         return jsonify(data)
     except Exception as e:
         print(f"[ERROR] Fetching bookings failed: {e}")
-        return jsonify({"error": "Failed to load bookings"}), 500
+        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
     finally:
         conn.close()
 
@@ -504,7 +512,7 @@ def api_blog():
         return jsonify(data)
     except Exception as e:
         print(f"[ERROR] /api/blog: {e}")
-        return jsonify({"error": str(e)}), 500
+        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
     finally:
         conn.close()
 if __name__ == '__main__':
