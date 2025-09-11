@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     nextMonthButton.addEventListener("click",function(){
         if(mm<thisMonth+5){
-            if(mm==thisMonth){
+            if(mm>thisMonth){
                 prevMonthButton.classList.remove("hidden");
             }
             
@@ -305,14 +305,15 @@ document.addEventListener('DOMContentLoaded', async function(){
             }
             calendarMaker(mm,mIntToMonth[mm],yyyy)
         }
-        if(mm==11&& thisMonth>7){
-            mm=0;
-            yyyy+=1;
-            if(mm==thisMonth+5){
-                nextMonthButton.classList.add("hidden")
-            }
-            calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
+        // if(mm==11&& thisMonth>7){
+        //     mm=0;
+        //     yyyy+=1;
+        //     if(mm==thisMonth+5){
+        //         nextMonthButton.classList.add("hidden")
+        //     }
+        //     calendarMaker(mm,mIntToMonth[mm],yyyy)
+        // }
+        
 
     })
     async function fetchBookings() {
@@ -418,69 +419,177 @@ async function calendarMaker(mm, monthText, year) {
     const eventsToday = bookings.filter(b => b.Date === dateStr);
 
     if (eventsToday.length) {
-        // let the cell grow with stacked event boxes
+        console.log("True");
         dateObject.style.display = "flex";
         dateObject.style.flexDirection = "column";
         dateObject.innerHTML = "";
+        var eventNum = 0;
 
-        let eventNum = 0;
-        eventsToday.forEach(event => {
-            // event box
-            const eventBox = document.createElement("div");
+        eventsToday.forEach(ev => {
+            // eventBox
+            var eventBox = document.createElement("div");
             eventBox.classList.add("eventBox");
-
-            // background
-            if (event.Artist1 === "TBD") {
-            eventBox.style.backgroundImage = "url('Images/TBDImage.jpg')";
-            } else if (event.Image_FilePath && event.Image_FilePath.substring(0,4) === "http") {
-            eventBox.style.backgroundImage = `url(${event.Image_FilePath})`;
-            } else if (event.Image_FilePath) {
-            eventBox.style.backgroundImage = `url('Images/${event.Image_FilePath}')`;
+            if (ev.Artist1 == "TBD") {
+                eventBox.style.backgroundImage = "url('Images/TBDImage.jpg')";
+            } else {
+                if(ev.Image_FilePath.substring(0,4)=="http"){
+                    eventBox.style.backgroundImage = `url( ${ev.Image_FilePath})`;
+                }
+                else{
+                    eventBox.style.backgroundImage = "url('Images/" + ev.Image_FilePath + "')";
+                }
+                
             }
 
-            // put the calendar day number on the first event only
-            if (eventNum === 0) {
-            const pDate = document.createElement("p");
-            pDate.className = "evDate";           // use a class, avoid duplicate IDs
-            pDate.textContent = startDate;
-            eventBox.appendChild(pDate);
+            if (eventNum == 0) {
+                var pDate = document.createElement("p");
+                pDate.id = "evDate";
+                pDate.textContent = startDate;
+                eventBox.appendChild(pDate);
             }
 
-            const h4 = document.createElement("h4");
-            h4.textContent = event.Artist1 === "TBD" ? "TBD" : event.Artist1;
+            var h4 = document.createElement("h4");
+            if (ev.Artist1 == "TBD") {
+                h4.textContent = "TBD";
+            } else {
+                h4.textContent = ev.Artist1;
+            }
             eventBox.appendChild(h4);
 
-            // slide-over
-            const slideOver = document.createElement("div");
+            // slideOver
+            var slideOver = document.createElement("div");
             slideOver.classList.add("eventSlideOver", "hidden");
-            slideOver.innerHTML =
-            event.Artist1 === "TBD"
-                ? `<p>${event.Date}</p><p>Times: ${event.Time}</p><p>${event.Venue}</p><p>Interested?</p>`
-                : `<p>${event.Date}</p><p>${event.Time}</p><p>${event.Venue}</p><address>${event.Address}</address><p>${event.TicketPrice}</p>`;
 
-            // hover behavior (kept simple)
-            eventBox.addEventListener("mouseenter", () => {
-            dateObject.querySelectorAll(".eventSlideOver").forEach(so => so.classList.add("hidden"));
-            dateObject.querySelectorAll(".eventBox").forEach(b => b.classList.remove("blur"));
-            slideOver.classList.remove("hidden");
-            eventBox.classList.add("blur");
+            if (ev.Artist1 == "TBD") {
+                slideOver.innerHTML = 
+                    "<p>" + ev.Date + "</p>" +
+                    "<p>Times: " + ev.Time + "</p>" +
+                    "<p>Interested?</p>";
+            } else {
+                slideOver.innerHTML = 
+                    "<p>" + ev.Date + "</p>" +
+                    "<p>" + ev.Time + "</p>" +
+                    "<address>" + ev.Address + "</address>" +
+                    "<p>" + ev.TicketPrice + "</p>";
+            }
+
+            // hover
+            function showSlideOverFor(evBox, slOver) {
+                dateObject.querySelectorAll(".eventSlideOver").forEach(function(so) {
+                    so.classList.add("hidden");
+                });
+                slOver.classList.remove("hidden");
+                dateObject.querySelectorAll(".eventBox").forEach(function(box) {
+                    box.classList.remove("blur");
+                });
+                evBox.classList.add("blur");
+            }
+
+            // Hover on the eventBox
+            eventBox.addEventListener("mouseenter", function() {
+                showSlideOverFor(eventBox, slideOver);
             });
-            dateObject.addEventListener("mouseleave", () => {
-            dateObject.querySelectorAll(".eventSlideOver").forEach(so => so.classList.add("hidden"));
-            dateObject.querySelectorAll(".eventBox").forEach(b => b.classList.remove("blur"));
+
+            // Also hover detection on the slideOver itself
+            slideOver.addEventListener("mousemove", function(e) {
+                // Get position relative to dateObject
+                const rect = dateObject.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                const height = rect.height;
+                const boxHeight = height / eventsToday.length;
+
+                // Figure out which eventBox index we're over
+                const index = Math.floor(y / boxHeight);
+                const targetEventBox = dateObject.querySelectorAll(".eventBox")[index];
+                const targetSlideOver = dateObject.querySelectorAll(".eventSlideOver")[index];
+
+                if (targetEventBox && targetSlideOver) {
+                    showSlideOverFor(targetEventBox, targetSlideOver);
+                }
+            });
+            dateObject.addEventListener("mouseleave", function() {
+                dateObject.querySelectorAll(".eventSlideOver").forEach(function(so) {
+                    so.classList.add("hidden");
+                });
+                dateObject.querySelectorAll(".eventBox").forEach(function(box) {
+                    box.classList.remove("blur");
+                });
+            });
+            function openEventModal(ev) {
+                var extraArtists = [];
+                if (ev.Artist2) {
+                    extraArtists.push(ev.Artist2);
+                }
+                if (ev.Artist3) {
+                    extraArtists.push(ev.Artist3);
+                }
+
+                var myHTMLBuilder = "<div class='modalContent'>" +
+                    "<h3 id='bandName'>" + ev.Artist1 + "</h3>";
+
+                if (extraArtists.length > 0) {
+                    myHTMLBuilder += "<div style='border: 2px solid #468caf; max-width:40%'>" +
+                        "<h4>" + extraArtists[0] + "</h4>";
+                    if (extraArtists.length > 1) {
+                        myHTMLBuilder += "<h4>" + extraArtists[1] + "</h4>";
+                    }
+                    myHTMLBuilder += "</div>";
+                }
+
+                if (ev.Artist1 == "TBD") {
+                    myHTMLBuilder +=
+                        "<p id='eventDate'>" + ev.Date + "</p>" +
+                        "<p id='eventTime'>Open Times: " + ev.Time + "</p>" +
+                        "<p id='eventVenue'>" + ev.Venue + "</p>" +
+                        "<address id='eventPlace'>" + ev.Address + "</address>" +
+                        "<p> if you're an artist and would like to play <br>" +
+                        "show interest with the email below. <br>" +
+                        "Please provide the date and time you're interested in<br>" +
+                        "as well as your name and phone number for easy communication</p>" +
+                        "<a href='mailto:fork+plate@gmail.com?subject=" + ev.Date + "-(ARTIST NAME)-Artist-Interest-Form&body= I, (YOUR (Band's) NAME) am interested in playing on " + ev.Date + " at " + ev.Venue + " at (TIME) %0D%0A NAME %0D%0A ADDRESS'>Fork+Plate@gmail.com</a>";
+                } else {
+                    myHTMLBuilder +=
+                        "<p id='eventDate'>" + ev.Date + "</p>" +
+                        "<p id='eventTime'>" + ev.Time + "</p>" +
+                        "<p id='eventVenue'>" + ev.Venue + "</p>" +
+                        "<address id='eventPlace'>" + ev.Address + "</address>" +
+                        "<p id='eventPrice'>" + ev.TicketPrice + "</p>";
+                }
+
+                if (ev.AnyExtraInfo) {
+                    myHTMLBuilder += "<p>" + ev.AnyExtraInfo + "</p>";
+                }
+
+                myHTMLBuilder += "</div>";
+
+                myModal.innerHTML = myHTMLBuilder;
+                document.getElementById("eventModal").classList.remove("hidden");
+                slideOver.classList.add("hidden");
+                eventBox.classList.remove("blur");
+            }
+
+            // Listen for clicks on either eventBox or slideOver
+            
+            // click
+            eventBox.addEventListener("click", function() {
+                openEventModal(ev);
+            });
+            slideOver.addEventListener("click", function() {
+                openEventModal(ev);
             });
 
-            // click → modal (reuse your existing handler contents)
-            eventBox.addEventListener("click", () => { /* open modal with this event */ });
-
-            // append
             dateObject.appendChild(slideOver);
             dateObject.appendChild(eventBox);
+
             eventNum += 1;
         });
-    } else {
-        dateObject.innerHTML = `<p class="evDate">${startDate}</p>`;
-    }
+
+        document.getElementById("eventModal").addEventListener("click", function() {
+            this.classList.add("hidden");
+        });
+        } else {
+            dateObject.innerHTML = `<p id="evDate">${startDate}</p>`;
+        }
     
 
     calendarStart++;
