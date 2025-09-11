@@ -456,9 +456,17 @@ def api_bookings():
         data = [dict(row) for row in rows]
         print(f"[DEBUG] Returning {len(data)} bookings")
         return jsonify(data)
-    except Exception as e:
-        print(f"[ERROR] Fetching bookings failed: {e}")
-        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
+    except sqlite3.OperationalError as e:
+        # If DB is warming or table missing, don't 503 the page—return empty list.
+        if "no such table: Blog" in str(e):
+            try:
+                ensure_schema()  # idempotent
+            except Exception:
+                pass
+            return jsonify([]), 200
+
+        # Other OperationalErrors: treat as transient
+        return jsonify({"error": "blog transient"}), 500
     finally:
         conn.close()
 
@@ -474,9 +482,17 @@ def api_carousel():
         data = [dict(row) for row in rows]
         print(f"[DEBUG] Returning {len(data)} Images")
         return jsonify(data)
-    except Exception as e:
-        print(f"[ERROR] Fetching Carousel failed: {e}")
-        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
+    except sqlite3.OperationalError as e:
+        # If DB is warming or table missing, don't 503 the page—return empty list.
+        if "no such table: Blog" in str(e):
+            try:
+                ensure_schema()  # idempotent
+            except Exception:
+                pass
+            return jsonify([]), 200
+
+        # Other OperationalErrors: treat as transient
+        return jsonify({"error": "blog transient"}), 500
     finally:
         conn.close()
 
@@ -492,9 +508,17 @@ def api_Communitybookings():
         data = [dict(row) for row in rows]
         print(f"[DEBUG] Returning {len(data)} bookings")
         return jsonify(data)
-    except Exception as e:
-        print(f"[ERROR] Fetching bookings failed: {e}")
-        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
+    except sqlite3.OperationalError as e:
+        # If DB is warming or table missing, don't 503 the page—return empty list.
+        if "no such table: Blog" in str(e):
+            try:
+                ensure_schema()  # idempotent
+            except Exception:
+                pass
+            return jsonify([]), 200
+
+        # Other OperationalErrors: treat as transient
+        return jsonify({"error": "blog transient"}), 500
     finally:
         conn.close()
 
@@ -508,9 +532,17 @@ def api_blog():
         rows = c.fetchall()
         data = [dict(row) for row in rows]
         return jsonify(data)
-    except Exception as e:
-        print(f"[ERROR] /api/blog: {e}")
-        return (jsonify({"error":"warming"}), 503, {"Retry-After": "1"})
+    except sqlite3.OperationalError as e:
+        # If DB is warming or table missing, don't 503 the page—return empty list.
+        if "no such table: Blog" in str(e):
+            try:
+                ensure_schema()  # idempotent
+            except Exception:
+                pass
+            return jsonify([]), 200
+
+        # Other OperationalErrors: treat as transient
+        return jsonify({"error": "blog transient"}), 500
     finally:
         conn.close()
 if __name__ == '__main__':
