@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', async function(){
     // ];
 
   // render each as soon as it finishes (progressive)
-  carouselP.then(renderCarousel).catch(()=>{});
-  bookingsP.then(renderCalendar).catch(()=>{});
-  blogP.then(renderBlogList).catch(()=>{});
+//   carouselP.then(renderCarousel).catch(()=>{});
+//   bookingsP.then(renderCalendar).catch(()=>{});
+//   blogP.then(renderBlogList).catch(()=>{});
     const carouselImages=await fetchQuick('/api/carousel');
     carouselImages.forEach(image =>{
         imageFilenames.push(image.FilePath);
