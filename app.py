@@ -68,15 +68,13 @@ APP_READY = wait_for_db_ready()
 @app.get("/healthz")
 def healthz():
     try:
-        with open_conn() as c:
-            # minimal reads that also create pages in cache
-            c.execute("SELECT 1 FROM Bookings LIMIT 1")
-            c.execute("SELECT 1 FROM CommunityBookings LIMIT 1")
-            c.execute("SELECT 1 FROM Carousel LIMIT 1")
-            c.execute("SELECT 1 FROM Blog LIMIT 1")
-        return {"ok": True}, 200
+        # very small, bounded check; does not depend on specific tables existing
+        with sqlite3.connect(DB_PATH, timeout=2) as c:
+            c.execute("SELECT 1")
+        return jsonify(ok=True), 200
     except Exception as e:
-        return {"ok": False, "err": str(e)}, 503
+        # keep it non-200 so Fly won’t route yet, but never crash the worker
+        return jsonify(ok=False, err=str(e)), 503
 import traceback
 from jinja2 import TemplateNotFound, UndefinedError
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
