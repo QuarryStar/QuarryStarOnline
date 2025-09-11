@@ -8,11 +8,15 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__, static_folder="public")
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'Databases', 'Bookings-FP.db')
+DB_PATH = os.environ.get("DB_PATH", "/data/Bookings-FP.db")
 
 def open_conn():
-    conn = sqlite3.connect(DB_PATH)
+    # robust defaults for SQLite in web apps
+    conn = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    # Optional: make writes safer/faster for concurrent reads
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     return conn
 import traceback
 from jinja2 import TemplateNotFound, UndefinedError
@@ -44,6 +48,27 @@ def _unauth():
 
 # --- TEMP DIAGNOSTIC admin route wrapper ---
 from flask import render_template
+
+@app.get("/api/diag")
+def api_diag():
+    p = DB_PATH
+    try:
+        st = os.stat(p)
+        size = st.st_size
+        exists = True
+    except FileNotFoundError:
+        size = None
+        exists = False
+    return jsonify({"db_path": p, "db_exists": exists, "db_size": size})
+
+@app.after_request
+def _no_cache(resp):
+    # don't touch streamed responses
+    if getattr(resp, "direct_passthrough", False):
+        return resp
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
 
 @app.get("/admin")
 @login_required
