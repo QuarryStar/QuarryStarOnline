@@ -5,19 +5,70 @@ from flask_cors import CORS
 import sqlite3
 import os
 from werkzeug.middleware.proxy_fix import ProxyFix
+import time
 
 app = Flask(__name__, static_folder="public")
 
 DB_PATH = os.environ.get("DB_PATH", "/data/Bookings-FP.db")
 
 def open_conn():
-    # robust defaults for SQLite in web apps
-    conn = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
+    conn = sqlite3.connect(DB_PATH, timeout=60, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    # Optional: make writes safer/faster for concurrent reads
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA synchronous=NORMAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")  # avoid SQLITE_BUSY early on
     return conn
+
+def ensure_schema():
+    with open_conn() as c:
+        c.executescript("""
+        -- create the tables you actually use; IF NOT EXISTS is key
+        CREATE TABLE IF NOT EXISTS Bookings (
+          id INTEGER PRIMARY KEY,
+          Date TEXT NOT NULL,
+          Artist TEXT,
+          Venue TEXT,
+          Address TEXT,
+          Ticket_Price TEXT,
+          Image_File_Path TEXT,
+          Any_Extra_Info TEXT
+        );
+        CREATE TABLE IF NOT EXISTS CommunityBookings(
+          id INTEGER PRIMARY KEY,
+          Date TEXT NOT NULL,
+          Artist TEXT,
+          Time TEXT,
+          Venue TEXT,
+          Address TEXT,
+          Ticket_Price TEXT,
+          Image_File_Path TEXT,
+          Any_Extra_Info TEXT
+        );
+        CREATE TABLE IF NOT EXISTS Carousel(
+          id INTEGER PRIMARY KEY,
+          FilePath TEXT NOT NULL
+        );
+        """)
+        c.execute("SELECT 1;")
+
+def wait_for_db_ready(max_wait_sec=30):
+    start = time.time()
+    while True:
+        try:
+            ensure_schema()
+            return True
+        except Exception:
+            if time.time() - start > max_wait_sec:
+                return False
+            time.sleep(0.25)
+
+# Call this once on startup (import-time or under if __name__ == '__main__')
+APP_READY = wait_for_db_ready()
+
+@app.get("/healthz")
+def healthz():
+    # Only say "healthy" when DB is really usable
+    return (jsonify({"ok": True}), 200) if APP_READY else (jsonify({"ok": False}), 503)
 import traceback
 from jinja2 import TemplateNotFound, UndefinedError
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user

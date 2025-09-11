@@ -23,13 +23,12 @@ primary_region = 'atl'
   processes = ['app']
 
   [[http_service.checks]]
-    interval = "10s"
+    interval = "5s"
     timeout = "2s"
-    grace_period = "5s"
+    grace_period = "30s"   # give your app time to init DB
     method = "GET"
-    path = "/"
+    path = "/healthz"      # <— use the cheap, DB-ready check
     protocol = "http"
-    tls_skip_verify = false
 
 [[vm]]
   memory = '1gb'
