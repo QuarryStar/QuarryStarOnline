@@ -528,7 +528,7 @@ def api_blog():
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try:
-        c.execute('SELECT * FROM BlogPosts ORDER BY id DESC')
+        c.execute('SELECT * FROM Blog ORDER BY id DESC')
         rows = c.fetchall()
         data = [dict(row) for row in rows]
         return jsonify(data)
