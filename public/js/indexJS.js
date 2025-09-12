@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async function(){
                         div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>Check Out The Latest Edition Of The Telecast Zine Here!</p></a>`
                     }
                     else if(blogg.Image1Filepath && !blogg.Paragraph1){
-                        div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><img src=url(${blogg.Image1Filepath}) alt='blog image'></a>`
+                        div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink" style="background-image:url(${blogg.Image1Filepath})"></a>`
                     }
                     else{
                         div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>${blogg.Paragraph1.substring(0,150)}...</p></a>`
