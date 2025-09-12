@@ -35,56 +35,50 @@ document.addEventListener('DOMContentLoaded', function(){
     console.log(today);
     calendarMaker(mm,mIntToMonth[mm],yyyy);
     console.log(tomorrow);
-    prevMonthButton.addEventListener("click",function(){
-        if(mm>thisMonth){
-            if(mm==thisMonth+5||(mm==thisMonth+5-12)){
-                nextMonthButton.classList.remove("hidden")
-            }
-            mm-=1;
-            if(mm==thisMonth){
-                prevMonthButton.classList.add("hidden");
-            }
-            calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
-        if(mm==0&& thisMonth>=7){
-            mm=11;
-            yyyy-=1;
-            if(mm<thisMonth+5){
-                nextMonthButton.classList.remove("hidden");
-            }
-            if(mm==thisMonth){
-                prevMonthButton.classList.add("hidden");
-            }
-            calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
-    })
+    const ym = (y, m) => y * 12 + m;              // absolute month index
+    const setFromYM = v => {                      // derive yyyy/mm from absolute month
+        yyyy = Math.floor(v / 12);
+        mm   = v % 12;
+    };
 
-    nextMonthButton.addEventListener("click",function(){
-        if(mm<thisMonth+5){
-            if(mm==thisMonth){
-                prevMonthButton.classList.remove("hidden");
-            }
-            
-            mm+=1;
-            if(mm==thisMonth+5){
-                nextMonthButton.classList.add("hidden")
-            }
-            if(mm==12){
-                mm=0;
-                yyyy+=1;
-            }
-            calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
-        if(mm==11&& thisMonth>7){
-            mm=0;
-            yyyy+=1;
-            if(mm==thisMonth+5){
-                nextMonthButton.classList.add("hidden")
-            }
-            calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
+    // Bounds: from "now" month to +5 months
+    const BASE_Y = new Date().getFullYear();      // use the real current year
+    const MIN_YM = ym(BASE_Y, thisMonth);         // current month
+    const MAX_YM = MIN_YM + 5;                    // current + 5 months
 
-    })
+    // Track current view as absolute month (matches your existing yyyy/mm)
+    let viewYM = ym(yyyy, mm);
+
+    function renderAndUpdateButtons() {
+    // sync yyyy/mm from viewYM
+        setFromYM(viewYM);
+
+        // render
+        calendarMaker(mm, mIntToMonth[mm], yyyy);
+
+        // buttons
+        prevMonthButton.classList.toggle('hidden', viewYM <= MIN_YM);
+        nextMonthButton.classList.toggle('hidden', viewYM >= MAX_YM);
+    }
+
+    // NEXT
+    nextMonthButton.addEventListener("click", function () {
+        if (viewYM < MAX_YM) {
+            viewYM += 1;           // Date rollover implied by absolute month math
+            renderAndUpdateButtons();
+        }
+    });
+
+    // PREV
+    prevMonthButton.addEventListener("click", function () {
+    if (viewYM > MIN_YM) {
+        viewYM -= 1;
+        renderAndUpdateButtons();
+    }
+    });
+
+    // Initial pass (ensures buttons reflect bounds immediately)
+    renderAndUpdateButtons();
     async function fetchBookings() {
         // try {
         //     const response = await fetch('/api/bookings');

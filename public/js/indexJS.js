@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     prevMonthButton.addEventListener("click",function(){
         if(mm>thisMonth){
             if(mm==thisMonth+5||(mm==thisMonth+5-12)){
-                nextMonthButton.classList.add("hidden")
+                nextMonthButton.classList.remove("hidden")
             }
             mm-=1;
             if(mm==thisMonth){
@@ -290,8 +290,8 @@ document.addEventListener('DOMContentLoaded', async function(){
     })
 
     nextMonthButton.addEventListener("click",function(){
-        if(mm<thisMonth+5 && mm<thisMonth+5-12){
-            if(mm>=thisMonth){
+        if(mm<thisMonth+5){
+            if(mm>thisMonth){
                 prevMonthButton.classList.remove("hidden");
             }
             
@@ -304,9 +304,6 @@ document.addEventListener('DOMContentLoaded', async function(){
                 yyyy+=1;
             }
             calendarMaker(mm,mIntToMonth[mm],yyyy)
-        }
-        else{
-            nextMonthButton.classList.add("hidden")
         }
         // if(mm==11&& thisMonth>7){
         //     mm=0;
