@@ -466,6 +466,7 @@ async function calendarMaker(mm, monthText, year) {
                 slideOver.innerHTML = 
                     "<p>" + ev.Date + "</p>" +
                     "<p>" + ev.Time + "</p>" +
+                    "<p>" + ev.Venue + "</p>" +
                     "<address>" + ev.Address + "</address>" +
                     "<p>" + ev.TicketPrice + "</p>";
             }
