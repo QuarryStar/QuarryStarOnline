@@ -9,6 +9,75 @@ import time
 
 app = Flask(__name__, static_folder="public")
 
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
+from flask import request, Response, abort
+
+ALLOWED_ASSET_HOSTS = {
+    "github.com",                      # /user-attachments/... landing URL
+    "objects.githubusercontent.com",   # GH object store
+    "media.githubusercontent.com",
+    "raw.githubusercontent.com",       # repo raw files
+    "user-images.githubusercontent.com"
+}
+
+@app.get("/asset-proxy")
+@app.get("/api/asset-proxy")  # support either path if your frontend uses /api/*
+def asset_proxy():
+    url = request.args.get("url")
+    if not url:
+        abort(400, "Missing url")
+
+    u = urlparse(url)
+    if u.scheme != "https" or u.netloc not in ALLOWED_ASSET_HOSTS:
+        abort(400, "URL not allowed")
+
+    # Forward Range so PDF viewers can stream; set a UA some CDNs like
+    headers = {"User-Agent": "asset-proxy/1.0"}
+    if "Range" in request.headers:
+        headers["Range"] = request.headers["Range"]
+
+    try:
+        upstream = urlopen(Request(url, headers=headers, method="GET"), timeout=25)
+    except Exception as e:
+        abort(502, f"Upstream fetch failed: {e}")
+
+    # Capture upstream status + headers
+    status = getattr(upstream, "status", 200)  # 200/206/etc
+    upstream_headers = dict(upstream.getheaders())
+    ct = upstream_headers.get("Content-Type") or ""
+
+    # GitHub sometimes sends octet-stream; force PDF content-type by extension
+    if (not ct or ct == "application/octet-stream") and u.path.lower().endswith(".pdf"):
+        ct = "application/pdf"
+
+    out_headers = {
+        "Content-Type": ct or "application/octet-stream",
+        "Cache-Control": upstream_headers.get("Cache-Control", "public, max-age=86400"),
+    }
+    if out_headers["Content-Type"].startswith("application/pdf"):
+        out_headers["Content-Disposition"] = "inline"
+
+    # Preserve range-related headers if present
+    for k in ("Content-Range", "Accept-Ranges", "Content-Length"):
+        v = upstream_headers.get(k)
+        if v:
+            out_headers[k] = v
+
+    def generate():
+        try:
+            while True:
+                chunk = upstream.read(64 * 1024)
+                if not chunk:
+                    break
+                yield chunk
+        finally:
+            try:
+                upstream.close()
+            except Exception:
+                pass
+
+    return Response(generate(), status=status, headers=out_headers)
 DB_PATH = os.environ.get("DB_PATH", "/data/Bookings-FP.db")
 
 def open_conn():

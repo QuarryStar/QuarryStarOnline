@@ -2,6 +2,33 @@
 
 const params = new URLSearchParams(window.location.search);
 const title = params.get("title");
+function buildPdfSrc(rawPath) {
+  if (!rawPath) return null;
+  const isAbs = /^https?:\/\//i.test(rawPath);
+
+  // If someone pasted a github "blob" URL, rewrite it to raw
+  if (isAbs && rawPath.startsWith("https://github.com/") && rawPath.includes("/blob/")) {
+    const parts = rawPath.split("/");
+    const user = parts[3], repo = parts[4], branch = parts[6], path = parts.slice(7).join("/");
+    rawPath = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
+  }
+
+  // If the file is hosted by GitHub attachment/raw hosts → proxy it (no CORS/X-Frame issues)
+  const isGH = isAbs && (
+    rawPath.startsWith("https://github.com/user-attachments/") ||
+    rawPath.startsWith("https://objects.githubusercontent.com/") ||
+    rawPath.startsWith("https://media.githubusercontent.com/") ||
+    rawPath.startsWith("https://raw.githubusercontent.com/") ||
+    rawPath.startsWith("https://user-images.githubusercontent.com/")
+  );
+  if (isGH) return `/asset-proxy?url=${encodeURIComponent(rawPath)}`;
+
+  // If you store bare filenames in DB, serve from your volume via /files/<name>
+  if (!isAbs) return `/files/${rawPath.replace(/^\/+/, "")}`;
+
+  // Otherwise use it as-is
+  return rawPath;
+}
 document.addEventListener("DOMContentLoaded", async function(){
     
     const prevButton = document.getElementById("BlogPostBackButton");
@@ -64,56 +91,48 @@ document.addEventListener("DOMContentLoaded", async function(){
     })
     if (post) {
         document.getElementById("blogPostTitle").innerHTML = post.Title;
-        
         document.getElementById("blogPostDate").textContent = post.Date;
         document.getElementById("BlogPostAuthor").textContent = post.Author;
-        var htmlBuilder="";
+
+        let htmlBuilder = "";
+
         if (post.Type === "zine") {
-            if(post.Image1Filepath.substring(0,4)=="http"){
-                const pdfPath = `${post.Image1Filepath}`;
-            }
-            else{
-                const pdfPath = `Images/BlogImages/${post.Image1Filepath}`;
-            }
-            
+            // Accept either an absolute GitHub link or a bare filename from DB
+            const rawPath = post.Image2Filepath;
+            const pdfSrc = buildPdfSrc(rawPath);
 
-            // Function to check PDF inline support
             function supportsPDFs() {
-                const testEl = document.createElement('embed');
-                testEl.type = 'application/pdf';
-                return !!testEl.type && navigator.mimeTypes['application/pdf'] !== undefined;
+            const el = document.createElement("embed");
+            el.type = "application/pdf";
+            return !!el.type && navigator.mimeTypes["application/pdf"] !== undefined;
             }
 
-            if (supportsPDFs()) {
-                // Show inline PDF
-                htmlBuilder += `
-                    <div class="pdf-container" style="width:100%; max-width:900px; margin:auto;">
-                        <iframe 
-                            src="${pdfPath}#view=FitH" 
-                            style="width:100%; height:80vh; border:none;" 
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                    <p style="text-align:center; margin-top:10px;">
-                        <a href="${pdfPath}" target="_blank" rel="noopener">
-                            📄 View or Download PDF
-                        </a>
-                    </p>
-                `;
-            } else {
-            // No PDF support → show only the link
+            if (supportsPDFs() && pdfSrc) {
             htmlBuilder += `
+                <div class="pdf-container" style="width:100%; max-width:900px; margin:auto;">
+                <iframe
+                    src="${pdfSrc}#view=FitH"
+                    style="width:100%; height:80vh; border:none;"
+                    loading="lazy"
+                    title="PDF">
+                </iframe>
+                </div>
                 <p style="text-align:center; margin-top:10px;">
-                    Your browser can't display PDFs inline. 
-                    <a href="${pdfPath}" target="_blank" rel="noopener">
-                        📄 View or Download PDF
-                    </a>
+                <a href="${pdfSrc}" target="_blank" rel="noopener">📄 View or Download PDF</a>
                 </p>
             `;
-        }
+            } else if (pdfSrc) {
+            htmlBuilder += `
+                <p style="text-align:center; margin-top:10px;">
+                Your browser can't display PDFs inline.
+                <a href="${pdfSrc}" target="_blank" rel="noopener">📄 View or Download PDF</a>
+                </p>
+            `;
+            }
 
-        document.getElementById("blogPostBody").innerHTML = htmlBuilder;
-    }  else {
+            document.getElementById("blogPostBody").innerHTML = htmlBuilder;
+            return; // prevent falling through to image/paragraph rendering
+  }  else {
         
             if(post.Paragraph1){
                 htmlBuilder+="<p>"+post.Paragraph1;
