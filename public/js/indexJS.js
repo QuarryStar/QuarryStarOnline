@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     // Bounds: from "now" month to +5 months
     const BASE_Y = new Date().getFullYear();      // use the real current year
-    const MIN_YM = ym(BASE_Y, thisMonth);         // current month
+    const MIN_YM = ym(2025, 8);    // September = 8 (0-based)         // current month
     const MAX_YM = MIN_YM + 5;                    // current + 5 months
 
     // Track current view as absolute month (matches your existing yyyy/mm)
