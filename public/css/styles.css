@@ -1589,4 +1589,7 @@ nav{
   .carousel-container{
     margin-top:250px;
   }
+  #titleCard{
+    top: -100px;
+  }
 }
