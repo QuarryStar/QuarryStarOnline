@@ -38,7 +38,7 @@ body{
   position:absolute;
   z-index:16;
   left:50%;
-  top:-50px;
+  top:-100px;
   transform: translateX(-50%);
   width:30%;
   object-fit:cover;
@@ -1585,11 +1585,8 @@ nav{
     background-color:#efd641;
   }
 }
-@media(min-width: 1400){
-  .carousel-container{
-    margin-top:250px;
-  }
+@media(max-width: 1400){
   #titleCard{
-    top: -100px;
+    top: -50px;
   }
 }
