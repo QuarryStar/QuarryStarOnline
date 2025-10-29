@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     let items = document.querySelectorAll('.carousel .carousel-item')
     const carouselContainer = document.querySelector('.carousel-container');
     const carouselTrack = document.querySelector('.carousel-track');
-
+    matchHemiHeight();
     const imageFilenames = [
         'forkLink',
         'blogLink'
@@ -106,13 +106,14 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     console.log(soonest);
     const blogItems= await fetchQuick('/api/blog')
-    window.addEventListener('load', matchHemiHeight);
-    window.addEventListener('resize', matchHemiHeight);
+    window.addEventListener('load', matchHemiHeight());
+    window.addEventListener('resize', matchHemiHeight());
     let images = []; // We will populate this dynamically
 
     function populateCarousel() {
         carouselTrack.innerHTML = ''; // Clear any existing content
         images = [];
+        matchHemiHeight();
 
         imageFilenames.forEach(filename => {
             const div = document.createElement('div');
