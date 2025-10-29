@@ -1585,3 +1585,8 @@ nav{
     background-color:#efd641;
   }
 }
+@media(min-width: 1400){
+  .carousel-container{
+    margin-top:250px;
+  }
+}
