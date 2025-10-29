@@ -130,6 +130,9 @@ document.addEventListener('DOMContentLoaded', async function(){
                             div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink"><h1>${blogg.Title}</h1><h2>${blogg.Author}</h2><p>Check Out The Latest Edition Of The Telecast Zine Here!</p></a>`
                         }
                     }
+                    else if(blogg.Type="imageFeature"){
+                        div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="forkLink" style="background-image:url(${blogg.Image1Filepath});background-size: cover;"><h1>${blogg.Title}</h1></a>`
+                    }
                     else if(blogg.Image1Filepath && !blogg.Paragraph1){
                         div.innerHTML=`<a href='blogPost.html?title=${encodedTitle}' class="blogLink" style="background-image:url(${blogg.Image1Filepath});background-size: cover;"></a>`
                     }

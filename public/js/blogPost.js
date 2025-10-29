@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", async function(){
                     htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image1Filepath}" alt="Blog Image">`
                 }
             }
-            if(post.Image2Filepath){
+            if(post.Image2Filepath!=""){
                 if(post.Image2Filepath.substring(0,4)=="http"){
                     htmlBuilder+=`<img class="BPImage" src="${post.Image2Filepath}" alt="Blog Image">`
                 }
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async function(){
                     htmlBuilder+=`<img class="BPImage" src="Images/BlogImages/${post.Image2Filepath}" alt="Blog Image">`
                 }
             }
-            if(post.Image3Filepath){
+            if(post.Image3Filepath!=""){
                 if(post.Image3Filepath.substring(0,4)=="http"){
                     htmlBuilder+=`<img class="BPImage" src="${post.Image3Filepath}" alt="Blog Image">`
 
